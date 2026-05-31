@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>نقشه‌ی شعر پارسی</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- HEADER -->
+    <div id="header">
+      <div id="header-title">
+        <h1>نقشه‌ی شعر پارسی</h1>
+        <p>Persian Poetry Map</p>
+      </div>
+      <div id="timeline-wrap">
+        <div id="era-label">
+          <span id="era-name">دوره‌ی سامانی</span>
+          <span id="era-years" dir="ltr">875 – 1000 CE</span>
+        </div>
+        <div id="timeline-track">
+          <input
+            type="range"
+            id="timeline-slider"
+            min="0"
+            max="5"
+            value="0"
+            step="1"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- MAP -->
+    <div id="map-container"></div>
+
+    <!-- ERA BADGE -->
+    <div id="era-badge">دوره‌ی سامانی · Samanid Era</div>
+
+    <!-- OVERLAY + PANEL -->
+    <div id="overlay">
+      <div id="panel">
+        <div id="panel-header">
+          <button id="panel-back">→ بازگشت</button>
+          <div id="panel-title-block">
+            <div id="panel-eyebrow">CITY</div>
+            <div id="panel-title">شیراز</div>
+            <div id="panel-subtitle"></div>
+          </div>
+          <button id="panel-close">✕</button>
+        </div>
+        <div id="panel-body"></div>
+      </div>
+    </div>
+
+    <!-- LEGEND -->
+    <div id="legend">
+      <p><strong>قلمرو فرهنگ ایرانی</strong></p>
+      <p>Greater Persian Cultural Realm</p>
+      <p style="margin-top: 6px; font-size: 11px">
+        ● Cities with poets in this era
+      </p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="map.js"></script>
+    <script src="ui.js"></script>
+  </body>
+</html>

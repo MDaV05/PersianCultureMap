@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>نقشه‌ی شعر پارسی</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<script src="https://unpkg.com/@mapbox/mapbox-gl-leaflet/leaflet-mapbox-gl.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8CC80;
+  --gold-dim: rgba(201,168,76,0.15);
+  --ink: #0f0d08;
+  --ink2: #1a1610;
+  --parchment: #F2E8D0;
+  --parchment2: #E0D0A8;
+  --rust: #8B3A2A;
+  --teal: #2A6B6B;
+  --panel-bg: rgba(15,13,8,0.97);
+  --text-light: #D4C49A;
+  --text-dim: #8A7A58;
+  --radius: 12px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Vazirmatn', sans-serif;
+  background: var(--ink);
+  color: var(--parchment);
+  height: 100vh;
+  overflow: hidden;
+  direction: rtl;
+}
+
+/* ── HEADER ── */
+#header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  padding: 14px 28px;
+  background: linear-gradient(180deg, rgba(10,8,4,0.98) 0%, rgba(10,8,4,0.85) 100%);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(201,168,76,0.12);
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+#header-title {
+  flex-shrink: 0;
+}
+
+#header-title h1 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+#header-title p {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 300;
+  direction: ltr;
+  text-align: right;
+}
+
+/* ── TIMELINE ── */
+#timeline-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#era-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#era-name {
+  font-size: 13px;
+  color: var(--gold-light);
+  font-weight: 500;
+}
+
+#era-years {
+  font-size: 11px;
+  color: var(--text-dim);
+  direction: ltr;
+}
+
+#timeline-track {
+  position: relative;
+  height: 28px;
+  display: flex;
+  align-items: center;
+}
+
+#timeline-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold) var(--pct, 0%), rgba(201,168,76,0.2) var(--pct, 0%));
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  direction: ltr;
+}
+
+#timeline-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid var(--ink);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.3), 0 2px 8px rgba(0,0,0,0.5);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+#timeline-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 5px rgba(201,168,76,0.25), 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.era-tick {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  transform: translateX(-50%);
+  top: 50%;
+  margin-top: -1px;
+}
+
+.era-tick-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(201,168,76,0.3);
+  margin-bottom: 3px;
+}
+
+/* ── MAP ── */
+#map {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1;
+  transition: filter 0.4s ease;
+}
+
+#map.blurred {
+  filter: blur(5px) brightness(0.5);
+  pointer-events: none;
+}
+
+/* Leaflet overrides */
+.leaflet-container { background: #1a1408 !important; }
+.leaflet-tile { filter: sepia(60%) hue-rotate(10deg) brightness(0.45) saturate(0.8); }
+
+/* ── CITY MARKER ── */
+.city-marker {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.city-marker:hover { transform: scale(1.15); }
+
+.city-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #FFE08A, var(--gold));
+  border: 2px solid rgba(255,220,100,0.5);
+  box-shadow: 0 0 10px rgba(201,168,76,0.7), 0 0 20px rgba(201,168,76,0.3);
+  animation: pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(201,168,76,0.7), 0 0 16px rgba(201,168,76,0.3); }
+  50% { box-shadow: 0 0 14px rgba(201,168,76,0.9), 0 0 28px rgba(201,168,76,0.5); }
+}
+
+.city-label {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gold-light);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.8);
+  pointer-events: none;
+}
+
+/* ── OVERLAY PANEL ── */
+#overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px 20px;
+}
+
+#overlay.active { display: flex; }
+
+#panel {
+  background: var(--panel-bg);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 680px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(201,168,76,0.08);
+  animation: panelIn 0.35s cubic-bezier(0.16,1,0.3,1);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201,168,76,0.3) transparent;
+}
+
+@keyframes panelIn {
+  from { opacity:0; transform: translateY(24px) scale(0.97); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+
+#panel-header {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid rgba(201,168,76,0.1);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  background: var(--panel-bg);
+  z-index: 2;
+}
+
+#panel-back {
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.2);
+  color: var(--gold);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  display: none;
+}
+
+#panel-back:hover { background: rgba(201,168,76,0.15); }
+#panel-back.visible { display: block; }
+
+#panel-close {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-dim);
+  font-size: 18px;
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+#panel-close:hover { background: rgba(255,255,255,0.1); color: var(--parchment); }
+
+#panel-title-block { flex: 1; }
+
+#panel-eyebrow {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 4px;
+  direction: ltr;
+  text-align: right;
+}
+
+#panel-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--parchment);
+  line-height: 1.2;
+}
+
+#panel-subtitle {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+#panel-body { padding: 20px 24px 24px; }
+
+/* ── POET CARDS ── */
+.poet-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(201,168,76,0.1);
+  background: rgba(201,168,76,0.04);
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+
+.poet-card:hover {
+  border-color: rgba(201,168,76,0.3);
+  background: rgba(201,168,76,0.09);
+  transform: translateX(-3px);
+}
+
+.poet-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rust), #5A2010);
+  border: 2px solid rgba(201,168,76,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.poet-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.poet-info { flex: 1; }
+
+.poet-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--parchment);
+  margin-bottom: 3px;
+}
+
+.poet-name-en {
+  font-size: 11px;
+  color: var(--text-dim);
+  direction: ltr;
+  text-align: right;
+}
+
+.poet-dates {
+  font-size: 11px;
+  color: var(--gold);
+  direction: ltr;
+  text-align: right;
+  margin-top: 2px;
+}
+
+.poet-arrow {
+  color: var(--text-dim);
+  font-size: 16px;
+  transform: scaleX(-1);
+}
+
+/* ── POET DETAIL ── */
+#poet-bio {
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--text-light);
+  margin-bottom: 24px;
+}
+
+.works-title {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+  direction: ltr;
+  text-align: right;
+}
+
+.work-tile {
+  border: 1px solid rgba(201,168,76,0.12);
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 12px;
+  background: rgba(255,255,255,0.02);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.work-tile:hover {
+  border-color: rgba(201,168,76,0.28);
+  background: rgba(201,168,76,0.06);
+}
+
+.work-tile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.work-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
+.work-name-en {
+  font-size: 11px;
+  color: var(--text-dim);
+  direction: ltr;
+}
+
+.work-desc {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+
+/* ── POEM VIEW ── */
+.poem-block {
+  background: rgba(201,168,76,0.04);
+  border: 1px solid rgba(201,168,76,0.12);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 14px;
+}
+
+.poem-intro {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+
+.poem-line {
+  font-size: 17px;
+  color: var(--parchment);
+  line-height: 2.2;
+  text-align: center;
+  font-weight: 400;
+}
+
+.poem-line + .poem-line {
+  border-top: 1px solid rgba(201,168,76,0.08);
+  padding-top: 10px;
+  margin-top: 2px;
+}
+
+.poem-divider {
+  text-align: center;
+  color: var(--gold);
+  font-size: 14px;
+  margin: 4px 0;
+  opacity: 0.5;
+}
+
+/* ── LEGEND ── */
+#legend {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 200;
+  background: rgba(10,8,4,0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(201,168,76,0.12);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--text-dim);
+  direction: ltr;
+}
+
+#legend p { margin-bottom: 4px; }
+#legend p:last-child { margin-bottom: 0; }
+#legend strong { color: var(--gold-light); }
+
+/* ── ERA BADGE ── */
+#era-badge {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  background: rgba(10,8,4,0.9);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 20px;
+  padding: 6px 18px;
+  font-size: 13px;
+  color: var(--gold-light);
+  pointer-events: none;
+  transition: opacity 0.5s;
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div id="header-title">
+    <h1>نقشه‌ی شعر پارسی</h1>
+    <p>Persian Poetry Map</p>
+  </div>
+  <div id="timeline-wrap">
+    <div id="era-label">
+      <span id="era-name">دوره‌ی سامانی</span>
+      <span id="era-years" dir="ltr">875 – 1000 CE</span>
+    </div>
+    <div id="timeline-track">
+      <input type="range" id="timeline-slider" min="0" max="5" value="0" step="1"/>
+    </div>
+  </div>
+</div>
+
+<!-- MAP -->
+<div id="map"></div>
+
+<!-- ERA BADGE -->
+<div id="era-badge">دوره‌ی سامانی · Samanid Era</div>
+
+<!-- OVERLAY + PANEL -->
+<div id="overlay">
+  <div id="panel">
+    <div id="panel-header">
+      <button id="panel-back" onclick="goBack()">→ بازگشت</button>
+      <div id="panel-title-block">
+        <div id="panel-eyebrow">CITY</div>
+        <div id="panel-title">شیراز</div>
+        <div id="panel-subtitle"></div>
+      </div>
+      <button id="panel-close" onclick="closePanel()">✕</button>
+    </div>
+    <div id="panel-body"></div>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div id="legend">
+  <p><strong>قلمرو فرهنگ ایرانی</strong></p>
+  <p>Greater Persian Cultural Realm</p>
+  <p style="margin-top:6px; font-size:11px;">● Cities with poets in this era</p>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+const ERAS = [
+  { name: "دوره‌ی سامانی", nameEn: "Samanid Era", years: "875 – 1000 CE" },
+  { name: "دوره‌ی غزنوی", nameEn: "Ghaznavid Era", years: "1000 – 1150 CE" },
+  { name: "دوره‌ی سلجوقی", nameEn: "Seljuk Era", years: "1150 – 1300 CE" },
+  { name: "دوره‌ی ایلخانی", nameEn: "Ilkhanate Era", years: "1260 – 1370 CE" },
+  { name: "دوره‌ی تیموری", nameEn: "Timurid Era", years: "1370 – 1500 CE" },
+  { name: "دوره‌ی صفوی", nameEn: "Safavid Era", years: "1500 – 1736 CE" },
+];
+
+const CITIES = [
+  {
+    id: "bukhara", name: "بخارا", nameEn: "Bukhara", lat: 39.77, lng: 64.42,
+    eras: [0,1],
+    poets: [
+      {
+        id:"rudaki", name:"رودکی", nameEn:"Rudaki", dates:"858 – 941 CE", emoji:"📜",
+        bio:"رودکی سمرقندی، پدر شعر فارسی، نخستین شاعر بزرگ ادبیات کلاسیک فارسی است. او در دربار سامانیان می‌زیست و گفته می‌شود بیش از صد هزار بیت سروده، اما تنها تعداد اندکی از اشعارش به دست ما رسیده است.",
+        works:[
+          { name:"بوی جوی مولیان", nameEn:"The Scent of Mulian River", desc:"قصیده‌ای مشهور که گفته می‌شود امیر سامانی را به اشک واداشت و او را به بازگشت به بخارا ترغیب کرد.", lines:["بوی جوی مولیان آید همی","یاد یار مهربان آید همی","ریگ آموی و درشتی‌های او","زیر پایم پرنیان آید همی"] },
+          { name:"مادر می", nameEn:"Mother of Wine", desc:"قطعه‌ای در ستایش می و شادی زندگی، از نمونه‌های درخشان شعر رودکی.", lines:["الا یا ایها الساقی ادر کاساً و ناولها","که عشق آسان نمود اول ولی افتاد مشکل‌ها"] },
+        ]
+      },
+      {
+        id:"daqiqi", name:"دقیقی", nameEn:"Daqiqi", dates:"935 – 977 CE", emoji:"⚔️",
+        bio:"دقیقی بلخی شاعر دربار سامانی بود که پیش از فردوسی کار نظم شاهنامه را آغاز کرد. او تنها هزار بیت سرود و پیش از اتمام کار به قتل رسید.",
+        works:[
+          { name:"آغاز شاهنامه", nameEn:"Beginning of Shahnameh", desc:"هزار بیتی که دقیقی از داستان‌های ایران باستان به نظم کشید و فردوسی آن را در شاهنامه‌ی خود گنجاند.", lines:["چهار چیز است کاندر جهان","به از هر چیزی پیش شاهان"] },
+        ]
+      }
+    ]
+  },
+  {
+    id: "tus", name: "توس / مشهد", nameEn: "Tus / Mashhad", lat: 36.27, lng: 59.56,
+    eras: [0,1,2],
+    poets: [
+      {
+        id:"ferdowsi", name:"فردوسی", nameEn:"Ferdowsi", dates:"940 – 1020 CE", emoji:"🦁",
+        bio:"ابوالقاسم فردوسی توسی، حماسه‌سرای بزرگ ایران، نویسنده‌ی شاهنامه است. او سی سال از عمر خود را صرف سرودن این اثر عظیم کرد که داستان پادشاهان و پهلوانان ایران را از آغاز تا حمله‌ی اعراب روایت می‌کند.",
+        works:[
+          { name:"شاهنامه", nameEn:"Shahnameh — Book of Kings", desc:"بزرگترین حماسه‌ی ادبیات فارسی، با بیش از پنجاه هزار بیت. فردوسی در این اثر تاریخ اساطیری ایران را زنده نگه داشت.", lines:["بسی رنج بردم در این سال سی","عجم زنده کردم بدین پارسی","نمیرم از این پس که من زنده‌ام","که تخم سخن را پراکنده‌ام"] },
+          { name:"رستم و سهراب", nameEn:"Rostam and Sohrab", desc:"یکی از تراژیک‌ترین داستان‌های شاهنامه؛ نبرد پدر و پسر که یکدیگر را نمی‌شناسند.", lines:["چو رستم سهراب را دید گفت آه","که این پهلوان خود ز خون من است"] },
+        ]
+      }
+    ]
+  },
+  {
+    id: "nishapur", name: "نیشابور", nameEn: "Nishapur", lat: 36.21, lng: 58.79,
+    eras: [1,2,3],
+    poets: [
+      {
+        id:"khayyam", name:"خیام", nameEn:"Omar Khayyam", dates:"1048 – 1131 CE", emoji:"🌹",
+        bio:"عمر خیام نیشابوری، ریاضیدان، منجم، و شاعر بزرگ ایرانی. رباعیات او که به فلسفه‌ی زندگی، مرگ، و لحظه‌ی حال می‌پردازد، در سراسر جهان ترجمه و خوانده شده است.",
+        works:[
+          { name:"رباعیات خیام", nameEn:"Rubaiyat of Omar Khayyam", desc:"مجموعه‌ای از رباعیات فلسفی که در آن خیام از گذرا بودن زندگی، اهمیت لحظه، و رازهای هستی سخن می‌گوید.", lines:["می خور که ز دانش و ز فضل و هنر","در کارگه کوزه‌گری رفتم دوش","دیدم دو هزار کوزه گویا و خموش","هر کوزه چو من عاشقی بوده‌ست"] },
+          { name:"رباعی آمدن", nameEn:"Rubaiyat on Coming and Going", desc:"یکی از مشهورترین رباعی‌های خیام درباره‌ی ناشناخته بودن رمز هستی.", lines:["آمدنم به عالم از بهر چه بود","رفتن به کجا؟ از این جهان بهر چه سود","در سینه‌ی من هزار سودا بنشست","در پرده هنوز راز عالم محجوب"] },
+        ]
+      },
+      {
+        id:"attar", name:"عطار", nameEn:"Attar of Nishapur", dates:"1145 – 1221 CE", emoji:"🦅",
+        bio:"فریدالدین عطار نیشابوری، شاعر و عارف بزرگ ایرانی. منطق‌الطیر او یکی از شاهکارهای ادبیات عرفانی فارسی است که سفر روح را در قالب سفر مرغان به سوی سیمرغ روایت می‌کند.",
+        works:[
+          { name:"منطق‌الطیر", nameEn:"The Conference of the Birds", desc:"منظومه‌ای عرفانی که در آن پرندگان به رهبری هدهد به جستجوی سیمرغ می‌روند و هفت وادی عشق را می‌پیمایند.", lines:["هدهد آمد پیش مرغان سرفراز","گفت ما را پادشاهی سرفراز","نام او سیمرغ سلطان طیور","او به ما نزدیک و ما از او به دور"] },
+        ]
+      }
+    ]
+  },
+  {
+    id: "shiraz", name: "شیراز", nameEn: "Shiraz", lat: 29.59, lng: 52.58,
+    eras: [2,3,4,5],
+    poets: [
+      {
+        id:"saadi", name:"سعدی", nameEn:"Saadi Shirazi", dates:"1210 – 1292 CE", emoji:"🌺",
+        bio:"مشرف‌الدین مصلح سعدی شیرازی، یکی از بزرگترین شاعران و نویسندگان ادب فارسی. بوستان و گلستان او از مهم‌ترین آثار ادب تعلیمی جهان هستند.",
+        works:[
+          { name:"گلستان", nameEn:"Gulistan — Rose Garden", desc:"اثری منثور آمیخته با شعر، شامل داستان‌ها و حکمت‌های اخلاقی. یکی از پرخواننده‌ترین آثار ادب فارسی.", lines:["بنی آدم اعضای یک پیکرند","که در آفرینش ز یک گوهرند","چو عضوی به درد آورد روزگار","دگر عضوها را نماند قرار"] },
+          { name:"بوستان", nameEn:"Bustan — The Orchard", desc:"منظومه‌ای اخلاقی و تعلیمی در ده باب که سعدی در آن از عدل، احسان، عشق، و تواضع سخن می‌گوید.", lines:["توانا بود هر که دانا بود","ز دانش دل پیر برنا بود"] },
+        ]
+      },
+      {
+        id:"hafez", name:"حافظ", nameEn:"Hafez of Shiraz", dates:"1315 – 1390 CE", emoji:"🌙",
+        bio:"خواجه شمس‌الدین محمد حافظ شیرازی، بزرگترین غزل‌سرای ادب فارسی. دیوان او که «لسان‌الغیب» نامیده می‌شود در هر خانه‌ی ایرانی یافت می‌شود و از آن فال می‌گیرند.",
+        works:[
+          { name:"دیوان حافظ", nameEn:"Divan of Hafez", desc:"مجموعه‌ای از غزل‌های لطیف که در آن‌ها عشق، می، عرفان، و انتقاد اجتماعی به هم آمیخته‌اند.", lines:["الا یا ایها الساقی ادر کاساً و ناولها","که عشق آسان نمود اول ولی افتاد مشکل‌ها","به بوی نافه‌ای کاخر صبا زان طره بگشاید","ز تاب جعد مشکینش چه خون افتاد در دل‌ها"] },
+          { name:"غزل شمع", nameEn:"The Candle Ghazal", desc:"یکی از زیباترین غزل‌های حافظ که در آن شمع نماد عاشق سوخته است.", lines:["دوش وقت سحر از غصه نجاتم دادند","و اندر آن ظلمت شب آب حیاتم دادند"] },
+        ]
+      }
+    ]
+  },
+  {
+    id: "balkh", name: "بلخ", nameEn: "Balkh", lat: 36.76, lng: 66.90,
+    eras: [2,3],
+    poets: [
+      {
+        id:"rumi", name:"مولانا", nameEn:"Rumi", dates:"1207 – 1273 CE", emoji:"🌀",
+        bio:"جلال‌الدین محمد بلخی، معروف به مولانا یا رومی، بزرگترین شاعر عارف ادبیات فارسی. او در بلخ زاده شد اما در قونیه درگذشت. مثنوی او «قرآن زبان پهلوی» نامیده شده است.",
+        works:[
+          { name:"مثنوی معنوی", nameEn:"Masnavi-ye Ma'navi", desc:"شش دفتر شعر عرفانی که در آن‌ها مولانا با داستان‌ها و تمثیل‌ها عمیق‌ترین حقایق عرفانی را بیان می‌کند.", lines:["بشنو این نی چون شکایت می‌کند","از جدایی‌ها حکایت می‌کند","بشنو این نی چون شکایت می‌کند","از جدایی‌ها حکایت می‌کند","آتش عشق است کاندر نی فتاد","جوشش عشق است کاندر می فتاد"] },
+          { name:"دیوان شمس", nameEn:"Divan-e Shams", desc:"مجموعه‌ای از غزل‌ها و رباعیات پرشور که مولانا در اوج عشق خود به شمس تبریزی سرود.", lines:["من کجا بودم عجب کو بود راه من","ساقیا می ده که مستم کرده‌ای"] },
+        ]
+      }
+    ]
+  },
+  {
+    id: "samarkand", name: "سمرقند", nameEn: "Samarkand", lat: 39.65, lng: 66.97,
+    eras: [0,1,4],
+    poets: [
+      {
+        id:"jami", name:"جامی", nameEn:"Jami", dates:"1414 – 1492 CE", emoji:"✨",
+        bio:"نورالدین عبدالرحمان جامی، آخرین شاعر بزرگ دوره‌ی کلاسیک ادبیات فارسی. او را «خاتم‌الشعرا» — مُهر پایان شاعران کلاسیک — می‌نامند.",
+        works:[
+          { name:"هفت اورنگ", nameEn:"Seven Thrones", desc:"مجموعه‌ای از هفت منظومه‌ی بلند که جامی در آن‌ها به اقتباس از آثار نظامی و امیر خسرو پرداخته.", lines:["سخن چون آب زلال است بهل تا جاری شود","درین بحر خموشی خود چرا غرق نگردی"] },
+        ]
+      }
+    ]
+  },
+  {
+    id: "isfahan", name: "اصفهان", nameEn: "Isfahan", lat: 32.66, lng: 51.68,
+    eras: [5],
+    poets: [
+      {
+        id:"saeb", name:"صائب تبریزی", nameEn:"Saeb Tabrizi", dates:"1601 – 1676 CE", emoji:"🏛️",
+        bio:"صائب تبریزی، برجسته‌ترین نماینده‌ی سبک هندی در ادبیات فارسی. او با تصاویر بدیع و مضمون‌های فلسفی خود سبکی تازه در شعر فارسی ایجاد کرد.",
+        works:[
+          { name:"دیوان صائب", nameEn:"Divan of Saeb", desc:"مجموعه‌ای بزرگ از غزل‌ها که در آن‌ها صائب با ترکیبات تازه و مضمون‌های نو زبان شعر فارسی را گسترش داد.", lines:["زندگانی را غنیمت دان و از یاد بهار","در بهار زندگی غافل مشو از روزگار"] },
+        ]
+      }
+    ]
+  },
+];
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let currentEra = 0;
+let panelStack = []; // stack of {type, data} for back navigation
+let cityMarkers = {};
+
+// ══════════════════════════════════════════
+// MAP INIT
+// ══════════════════════════════════════════
+const map = L.map('map', {
+  center: [35, 58],
+  zoom: 5,
+  zoomControl: false,
+  attributionControl: false,
+});
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 10, minZoom: 4,
+}).addTo(map);
+
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+// ══════════════════════════════════════════
+// CITY MARKERS
+// ══════════════════════════════════════════
+function createMarker(city) {
+  const el = document.createElement('div');
+  el.className = 'city-marker';
+  el.innerHTML = `<div class="city-dot"></div><div class="city-label">${city.name}</div>`;
+  const marker = L.marker([city.lat, city.lng], {
+    icon: L.divIcon({ className:'', html: el, iconSize:[14,14], iconAnchor:[7,7] })
+  });
+  marker.on('click', () => openCity(city));
+  return marker;
+}
+
+CITIES.forEach(city => {
+  const marker = createMarker(city);
+  cityMarkers[city.id] = marker;
+});
+
+// ══════════════════════════════════════════
+// ERA FILTERING
+// ══════════════════════════════════════════
+function updateEra(idx) {
+  currentEra = idx;
+  const era = ERAS[idx];
+
+  document.getElementById('era-name').textContent = era.name;
+  document.getElementById('era-years').textContent = era.years;
+  document.getElementById('era-badge').textContent = `${era.name} · ${era.nameEn}`;
+
+  // Update slider gradient
+  const slider = document.getElementById('timeline-slider');
+  const pct = (idx / (ERAS.length - 1)) * 100;
+  slider.style.setProperty('--pct', pct + '%');
+
+  // Show/hide markers
+  CITIES.forEach(city => {
+    const marker = cityMarkers[city.id];
+    const active = city.eras.includes(idx);
+    if (active) {
+      if (!map.hasLayer(marker)) marker.addTo(map);
+    } else {
+      if (map.hasLayer(marker)) map.removeLayer(marker);
+    }
+  });
+}
+
+// ══════════════════════════════════════════
+// PANEL SYSTEM
+// ══════════════════════════════════════════
+function openOverlay() {
+  document.getElementById('overlay').classList.add('active');
+  document.getElementById('map').classList.add('blurred');
+}
+
+function closePanel() {
+  document.getElementById('overlay').classList.remove('active');
+  document.getElementById('map').classList.remove('blurred');
+  panelStack = [];
+  document.getElementById('panel-back').classList.remove('visible');
+}
+
+function goBack() {
+  panelStack.pop();
+  if (panelStack.length === 0) { closePanel(); return; }
+  const prev = panelStack[panelStack.length - 1];
+  renderPanel(prev, false);
+}
+
+function openCity(city) {
+  panelStack = [{ type:'city', data: city }];
+  renderPanel(panelStack[0], false);
+  openOverlay();
+}
+
+function openPoet(poet, city) {
+  panelStack.push({ type:'poet', data: poet, city });
+  renderPanel(panelStack[panelStack.length-1], true);
+}
+
+function openWork(work, poet) {
+  panelStack.push({ type:'work', data: work, poet });
+  renderPanel(panelStack[panelStack.length-1], true);
+}
+
+function renderPanel({ type, data, city, poet }, showBack) {
+  const backBtn = document.getElementById('panel-back');
+  backBtn.classList.toggle('visible', showBack);
+
+  const eyebrow = document.getElementById('panel-eyebrow');
+  const title = document.getElementById('panel-title');
+  const subtitle = document.getElementById('panel-subtitle');
+  const body = document.getElementById('panel-body');
+
+  // Scroll to top
+  document.getElementById('panel').scrollTop = 0;
+
+  // Animate body
+  body.style.opacity = '0';
+  body.style.transform = 'translateY(8px)';
+  setTimeout(() => {
+    body.style.transition = 'opacity 0.25s, transform 0.25s';
+    body.style.opacity = '1';
+    body.style.transform = 'translateY(0)';
+  }, 20);
+
+  if (type === 'city') {
+    const era = ERAS[currentEra];
+    eyebrow.textContent = 'شهر · CITY';
+    title.textContent = data.name;
+    subtitle.textContent = data.nameEn + ' · ' + era.nameEn;
+
+    const poets = data.poets;
+    body.innerHTML = poets.map(p => `
+      <div class="poet-card" onclick="openPoet(${JSON.stringify(p).replace(/"/g,'&quot;')}, ${JSON.stringify(data).replace(/"/g,'&quot;')})">
+        <div class="poet-avatar">${p.emoji}</div>
+        <div class="poet-info">
+          <div class="poet-name">${p.name}</div>
+          <div class="poet-name-en">${p.nameEn}</div>
+          <div class="poet-dates">${p.dates}</div>
+        </div>
+        <div class="poet-arrow">←</div>
+      </div>
+    `).join('');
+
+  } else if (type === 'poet') {
+    eyebrow.textContent = 'شاعر · POET';
+    title.textContent = data.name;
+    subtitle.textContent = data.nameEn + ' · ' + data.dates;
+
+    body.innerHTML = `
+      <p id="poet-bio">${data.bio}</p>
+      <div class="works-title">WORKS · آثار برتر</div>
+      ${data.works.map(w => `
+        <div class="work-tile" onclick="openWork(${JSON.stringify(w).replace(/"/g,'&quot;')}, ${JSON.stringify({name:data.name,nameEn:data.nameEn}).replace(/"/g,'&quot;')})">
+          <div class="work-tile-header">
+            <div>
+              <div class="work-name">${w.name}</div>
+              <div class="work-name-en">${w.nameEn}</div>
+            </div>
+            <div style="color:var(--gold);font-size:18px;">←</div>
+          </div>
+          <div class="work-desc">${w.desc}</div>
+        </div>
+      `).join('')}
+    `;
+
+  } else if (type === 'work') {
+    eyebrow.textContent = 'اثر · WORK';
+    title.textContent = data.name;
+    subtitle.textContent = data.nameEn + (poet ? ' · ' + poet.nameEn : '');
+
+    body.innerHTML = `
+      <div class="poem-block">
+        <p class="poem-intro">${data.desc}</p>
+        <div class="poem-divider">— ✦ —</div>
+        ${data.lines.map(l => `<div class="poem-line">${l}</div>`).join('')}
+      </div>
+    `;
+  }
+}
+
+// ══════════════════════════════════════════
+// INLINE CLICK HANDLERS (for dynamically created HTML)
+// ══════════════════════════════════════════
+window.openPoet = function(poet, city) {
+  panelStack.push({ type:'poet', data: poet, city });
+  renderPanel(panelStack[panelStack.length-1], true);
+};
+
+window.openWork = function(work, poet) {
+  panelStack.push({ type:'work', data: work, poet });
+  renderPanel(panelStack[panelStack.length-1], true);
+};
+
+// ══════════════════════════════════════════
+// TIMELINE SLIDER
+// ══════════════════════════════════════════
+const slider = document.getElementById('timeline-slider');
+slider.addEventListener('input', e => {
+  updateEra(parseInt(e.target.value));
+});
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+updateEra(0);
+
+// Hide era badge after 3s
+setTimeout(() => {
+  document.getElementById('era-badge').style.opacity = '0';
+}, 3000);
+
+slider.addEventListener('input', () => {
+  const badge = document.getElementById('era-badge');
+  badge.style.opacity = '1';
+  clearTimeout(badge._hide);
+  badge._hide = setTimeout(() => badge.style.opacity = '0', 2000);
+});
+</script>
+</body>
+</html>
