@@ -507,11 +507,59 @@ body {
   opacity: 0.5;
 }
 
+/* Position the timeline over the map at the bottom */
+#timeline-container {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    max-width: 800px;
+    background: rgba(15, 15, 20, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(212, 175, 55, 0.3); /* Gold border */
+    border-radius: 16px;
+    padding: 20px 30px;
+    color: #fff;
+    font-family: system-ui, -apple-system, sans-serif;
+    z-index: 10; /* Make sure it stays above the map */
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+#era-info h2 {
+    margin: 0;
+    color: #d4af37; /* Gold */
+    font-size: 1.5rem;
+}
+
+#era-info p {
+    margin: 5px 0 15px 0;
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
+/* Style the range slider */
+#era-slider {
+    width: 100%;
+    accent-color: #d4af37;
+    cursor: pointer;
+}
+
+.slider-ticks {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: #888;
+    direction: rtl; /* For Persian text */
+}
 /* ── LEGEND ── */
 #legend {
   position: fixed;
-  bottom: 24px;
-  left: 24px;
+  bottom: 6px;
+  right: 4px;
+  left: auto;
   z-index: 200;
   background: rgba(10, 8, 4, 0.85);
   backdrop-filter: blur(8px);
@@ -553,7 +601,10 @@ body {
 /* map.ir container */
 #map-container {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 1;
   transition: filter 0.4s ease;
 }
@@ -601,4 +652,12 @@ body {
 @keyframes pulse {
   0%, 100% { box-shadow: 0 0 8px rgba(201,168,76,0.7), 0 0 16px rgba(201,168,76,0.3); }
   50%       { box-shadow: 0 0 16px rgba(201,168,76,1),   0 0 30px rgba(201,168,76,0.6); }
+}
+
+.maplibregl-ctrl-attrib {
+  display: none !important;
+}
+
+.maplibregl-ctrl-logo {
+  display: none !important;
 }

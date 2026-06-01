@@ -137,17 +137,24 @@ function updateEra(idx) {
 
   document.getElementById("era-name").textContent = era.name;
   document.getElementById("era-years").textContent = era.years;
-  document.getElementById("era-badge").textContent =
-    `${era.name} · ${era.nameEn}`;
+  document.getElementById("era-badge").textContent = `${era.name} · ${era.nameEn}`;
 
-  // Update slider gradient
   const slider = document.getElementById("timeline-slider");
   const pct = (idx / (ERAS.length - 1)) * 100;
   slider.style.setProperty("--pct", pct + "%");
 
-  // Update city markers
-  updateCityMarkers(idx);
+  // THE EXPERT WAY: Broadcast that the era changed, instead of calling a missing function
+  document.dispatchEvent(new CustomEvent('eraChanged', { detail: idx }));
 }
+
+// Ensure these are globally available since they are called by inline HTML clicks in your panel
+window.openPoet = openPoet;
+window.openWork = openWork;
+
+// Listen for the map telling the UI to open a city
+document.addEventListener('openCityPanel', (e) => {
+    openCity(e.detail);
+});
 
 function setupTimeline() {
   const slider = document.getElementById("timeline-slider");

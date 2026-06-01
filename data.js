@@ -20,7 +20,7 @@ const CITIES = [
     nameEn: "Bukhara",
     lat: 39.77, lon: 64.42,
     x: 320, y: 180,
-    eras: [0, 1],
+    eras: [0, 1, 2, 3],
     poets: [
       {
         id: "rudaki", name: "رودکی", nameEn: "Rudaki", dates: "858 – 941 CE", emoji: "📜",
@@ -44,7 +44,7 @@ const CITIES = [
     nameEn: "Tus / Mashhad",
     lat: 36.27, lon: 59.56,
     x: 380, y: 220,
-    eras: [0, 1, 2],
+    eras: [0, 1, 2, 3],
     poets: [
       {
         id: "ferdowsi", name: "فردوسی", nameEn: "Ferdowsi", dates: "940 – 1020 CE", emoji: "🦁",
