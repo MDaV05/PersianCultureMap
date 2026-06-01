@@ -11,8 +11,6 @@ implemented / pros / features:
 cons / goals / shortcomings:
 
 - huge work on UI is needed
-~~ - the map should just include iran's 'cultural' map,
-  for that purpose the biggest borders of persian empire is a good selection but albit difficult to  implement for now ~~
 - each poet should have his own disco- page
 - UI/UX ideas should be discussed for any further implementation and improvement
 
