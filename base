@@ -10,7 +10,7 @@
     />
     <div id="map-container"></div>
     <script  src="./ui.js"></script>
-    <script  src="./map2.js"></script>
+    <script src="./map2.js"></script>
     <style>
       :root {
         --gold: #c9a84c;

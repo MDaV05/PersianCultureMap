@@ -11,13 +11,15 @@ implemented / pros / features:
 cons / goals / shortcomings:
 
 - huge work on UI is needed
-- the map should just include iran's 'cultural' map,
-  for that purpose the biggest borders of persian empire is a good selection but albit difficult to  implement for now
+~~ - the map should just include iran's 'cultural' map,
+  for that purpose the biggest borders of persian empire is a good selection but albit difficult to  implement for now ~~
 - each poet should have his own disco- page
 - UI/UX ideas should be discussed for any further implementation and improvement
 
-PENDING 
+PENDING ( to do list)
 
-- a new idea for time slider
-- fixing borders via https://geojson.io
-- UI things
+- a new idea for time slider ( dav )
+- fixing borders via https://geojson.io ( bizhan )
+- UI things ( make it less wanky, add animations) ( bizhan )
+- design a new panel for cities and poets so we have more actual info + pics potentially ( bizhan )
+- more data on poets, cities and poems ( dav )
