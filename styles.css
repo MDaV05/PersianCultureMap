@@ -59,32 +59,41 @@ body {
   right: 0;
   z-index: 1000;
   padding: 16px 32px;
-  background: rgba(249, 246, 240, 0.92);
+  
+  /* Warm beige gradient from left to right + Islamic geometric pattern */
+  background-color: #000000;
+  background-image: 
+    linear-gradient(90deg, rgba(247, 234, 215, 0.95) 0%, rgba(213, 200, 184, 0.85) 100%),
+    url("images/islamic-pattern.svg");
+  background-size: cover, 100px 100px;
+  background-repeat: no-repeat, repeat;
+  
   backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--turquoise-light);
   display: flex;
   align-items: center;
   gap: 32px;
-  box-shadow: 0 4px 20px rgba(0, 150, 136, 0.08);
+  box-shadow: 0 4px 20px rgba(139, 111, 78, 0.15);
 }
 
 #header-title h1 {
   font-size: 22px;
   font-weight: 700;
-  color: var(--turquoise-dark);
+  color: #5D4E37; 
   letter-spacing: -0.5px;
   line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4);
 }
 
 #header-title p {
   font-family: var(--font-en);
   font-size: 12px;
-  color: var(--text-dim);
+  color: #6B5B45;
   font-weight: 400;
   font-style: italic;
   direction: ltr;
   text-align: right;
   margin-top: 2px;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 /* ── TIMELINE ── */
