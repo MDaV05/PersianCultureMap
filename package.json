@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/MDaV05/PersianCultureMap/issues"
   },
-  "homepage": "https://github.com/MDaV05/PersianCultureMap#readme"
+  "homepage": "https://github.com/MDaV05/PersianCultureMap#readme",
+  "dependencies": {
+    "bootstrap": "^5.3.8"
+  }
 }
