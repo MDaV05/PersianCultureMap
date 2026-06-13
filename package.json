@@ -1,0 +1,21 @@
+{
+  "name": "persianculturemap",
+  "version": "1.0.0",
+  "description": "a website that provides you with a map of persian poem influence through the world and its most important poets and works of the each respective poet thorugh the most important eras of persian culture.",
+  "main": "data.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MDaV05/PersianCultureMap.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/MDaV05/PersianCultureMap/issues"
+  },
+  "homepage": "https://github.com/MDaV05/PersianCultureMap#readme"
+}
