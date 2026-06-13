@@ -4,14 +4,11 @@
 
 **An interactive exploration of Persian poetry's influence across time and geography**
 
-[🌐 **Visit Website**](https://chekameh.xyz/)
-
 ![Persian Poetry Map](https://img.shields.io/badge/Persian_Poetry-Map-blue?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
 [![Website](https://img.shields.io/badge/website-chekameh.xyz-brightgreen?style=for-the-badge)](https://chekameh.xyz/)
 
 </div>
-
 ## 🇬🇧 English
 
 ### About the Project
@@ -114,7 +111,5 @@ This project is licensed under the MIT License.
 <div align="center">
 
 **Made with ❤️ for Persian Culture & Literature**
-
-[Visit **chekameh.xyz**](https://chekameh.xyz/) to explore Persian poetry's rich heritage
 
 </div>
