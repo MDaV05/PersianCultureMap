@@ -1,40 +1,50 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>نقشه‌ی شعر پارسی</title>
 
   <!-- MapLibre CSS — only once, pinned version -->
-  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet"/>
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet" />
 
   <!-- Your styles -->
-  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="styles.css" />
 
   <!-- Bootstrap -->
-   <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.rtl.min.css">
 </head>
+
 <body>
 
   <!-- HEADER -->
-  <div id="header">
-    <div id="header-title">
-      <h1>نقشه‌ی شعر پارسی</h1>
-      <p>Persian Poetry Map</p>
-    </div>
-    <div id="timeline-wrap">
-      <div id="era-label">
-        <span id="era-name">دوره‌ی سامانی</span>
-        <span id="era-years" dir="ltr">875 – 1000 CE</span>
+  <section id="header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-12 col-lg-3">
+          <div id="header-title">
+            <h1>نقشه‌ی شعر پارسی</h1>
+            <p>Persian Poetry Map</p>
+          </div>
+        </div>
+        <div class="col-12 col-lg-9">
+          <div id="timeline-wrap">
+            <div id="era-label">
+              <span id="era-name">دوره‌ی سامانی</span>
+              <span id="era-years" dir="ltr">875 – 1000 CE</span>
+            </div>
+            <div id="timeline-track w-100">
+              <input class="w-100" type="range" id="timeline-slider" dir="ltr" min="0" max="5" value="0" step="1" />
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="timeline-track">
-        <input type="range" id="timeline-slider" dir="ltr" min="0" max="5" value="0" step="1"/>
-      </div>
     </div>
-  </div>
+  </section>
 
   <!-- MAP -->
   <div id="map-container"></div>
@@ -72,7 +82,10 @@
   <script src="ui.js"></script>
 
   <!-- Bootstrap -->
-   <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+  <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+    crossorigin="anonymous"></script>
 
 </body>
+
 </html>
