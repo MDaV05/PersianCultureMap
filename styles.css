@@ -51,6 +51,15 @@ body {
 ::-webkit-scrollbar-thumb { background: var(--turquoise-light); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--turquoise); }
 
+/* Font */
+@font-face {
+  font-family: lalezar;
+  src: url("./assets/fonts/Lalezar.ttf");
+}
+.lalezar{
+  font-family: lalezar;
+}
+
 /* ── HEADER ── */
 #header {
   position: fixed;
@@ -198,10 +207,11 @@ body {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #ffffff, var(--turquoise));
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 12px rgba(0, 150, 136, 0.6), 0 0 24px rgba(0, 150, 136, 0.3);
+  background: ("./assets/Images/Hotspot.gif");
+  border: 2px solid #229799;
+  /* box-shadow: 0 0 12px rgba(0, 150, 136, 0.6), 0 0 24px rgba(0, 150, 136, 0.3); */
   animation: pulse-turquoise 3s ease-in-out infinite;
+  background-color: #F5F5F5;
 }
 
 @keyframes pulse-turquoise {
@@ -258,6 +268,7 @@ body {
     0 0 0 1px rgba(255, 255, 255, 0.5);
   animation: panelIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
+  overflow: hidden;
 }
 
 /* Decorative Corner Ornaments (Tazhib style) */
