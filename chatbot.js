@@ -149,3 +149,139 @@ function switchTier(tier) {
       : "✦ فردوس فعال شد"
   );
 }
+
+//──────────── ganjoor ────────────────────────────────────────────────────────────────
+
+async function getGanjoorContext(question) {
+  try {
+    const res = await fetch("https://api.ganjoor.net/api/ganjoor/poets");
+    if (!res.ok) return "";
+    const poets = await res.json();
+    const mentioned = poets.filter(p =>
+      question.includes(p.name) ||
+      question.toLowerCase().includes((p.nickName || "").toLowerCase())
+    ).slice(0, 3);
+
+    if (mentioned.length > 0) {
+      return "شاعران مرتبط:\n" + mentioned.map(p =>
+        `- ${p.name}${p.birthYearInLHCalendar ? " (تولد: " + p.birthYearInLHCalendar + ")" : ""}${p.deathYearInLHCalendar ? " (وفات: " + p.deathYearInLHCalendar + ")" : ""}`
+      ).join("\n");
+    }
+    return "شاعران گنجور: " + poets.slice(0, 12).map(p => p.name).join("، ");
+  } catch {
+    return "";
+  }
+}
+
+//──────────── send ──────────────────────────────────────────────────────────────────
+
+async function sendMessage() {
+  const input = document.getElementById("ferdows-input");
+  const question = input.value.trim();
+  if (!question) return;
+
+  input.value = "";
+  input.disabled = true;
+  document.getElementById("ferdows-send").disabled = true;
+
+  addMsg(question, "user");
+  const typingId = addTyping();
+
+  const model = MODELS[currentTier];
+
+  try {
+    const context = await getGanjoorContext(question);
+
+    const body = {
+      model: model.id,
+      max_tokens: currentTier === "plus" ? 1200 : 800,
+      messages: [
+        {
+          role: "system",
+          content: `تو «${model.name}» هستی، دستیار هوش مصنوعی شعر پارسی.
+
+${context ? "اطلاعات گنجور:\n" + context : ""}
+
+دستورالعمل‌ها:
+- اگر سوال فارسی است به فارسی پاسخ بده، اگر انگلیسی است به انگلیسی
+- پاسخ کوتاه، دقیق، و زیبا
+- برای اشعار، متن دقیق و منبع ذکر کن
+${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ارائه بده" : ""}`
+        },
+        { role: "user", content: question }
+      ]
+    };
+
+    if (currentTier === "plus") {
+      body.reasoning = { effort: "none" };
+    }
+
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        "HTTP-Referer": window.location.href,
+        "X-Title": "فردوس — نقشه‌ی شعر پارسی"
+      },
+      body: JSON.stringify(body)
+    });
+
+    removeTyping(typingId);
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const answer = data.choices?.[0]?.message?.content || "متاسفم، پاسخی دریافت نشد.";
+    addMsg(answer, "bot");
+
+  } catch (err) {
+    removeTyping(typingId);
+    addMsg(`خطا: ${err.message}`, "bot");
+    console.error(err);
+  } finally {
+    input.disabled = false;
+    document.getElementById("ferdows-send").disabled = false;
+    input.focus();
+  }
+}
+
+//──────────── helpers ────────────────────────────────────────────────────────────────
+function addMsg(text, role) {
+  const msgs = document.getElementById("ferdows-messages");
+  const div = document.createElement("div");
+  div.className = `fm ${role}`;
+  div.innerHTML = `<div class="fm-bubble">${text.replace(/\n/g, "<br>")}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addSystemMsg(text) {
+  const msgs = document.getElementById("ferdows-messages");
+  const div = document.createElement("div");
+  div.className = "fm-system";
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addTyping() {
+  const msgs = document.getElementById("ferdows-messages");
+  const id = "ftyping-" + Date.now();
+  const div = document.createElement("div");
+  div.className = "fm bot";
+  div.id = id;
+  div.innerHTML = `<div class="fm-bubble fm-typing"><span></span><span></span><span></span></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return id;
+}
+
+function removeTyping(id) {
+  document.getElementById(id)?.remove();
+}
+
+document.addEventListener("DOMContentLoaded", buildChatbot);
