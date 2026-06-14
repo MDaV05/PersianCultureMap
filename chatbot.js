@@ -216,11 +216,10 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
       body.reasoning = { effort: "none" };
     }
 
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const res = await fetch("https://persianculturemap.modavari005.workers.dev/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
         "HTTP-Referer": window.location.href,
         "X-Title": "فردوس — نقشه‌ی شعر پارسی"
       },

@@ -8,15 +8,15 @@ export default {
     const body = await request.json();
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${env.OPENROUTER_API_KEY}`,
-        "HTTP-Referer": "https://yourwebsite.com", // You can change this to your actual domain
-        "X-Title": "Ferdows AI"
-      },
-      body: JSON.stringify(body)
-    });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${env.OPENROUTER_API_KEY}`,
+    "HTTP-Referer": request.headers.get("HTTP-Referer") || "https://chekameh.xyz",
+    "X-Title": request.headers.get("X-Title") || "Ferdows AI"
+  },
+  body: JSON.stringify(body)
+});
 
     const data = await response.json();
 
