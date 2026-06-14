@@ -88,3 +88,64 @@ function buildChatbot() {
   });
 }
 
+// ── open toggle ────────────────────────────────────────────────────────────────
+function toggleChat() {
+  chatOpen = !chatOpen;
+  const chat = document.getElementById("ferdows-chat");
+  const card = document.getElementById("ferdows-card");
+  const fab = document.getElementById("ferdows-fab");
+
+  if (chatOpen) {
+    chat.classList.add("open");
+    card.style.display = "none";
+    fab.style.display = "none";
+    setTimeout(() => document.getElementById("ferdows-input").focus(), 400);
+  } else {
+    chat.classList.remove("open");
+    // Show FAB if card was dismissed, otherwise show card
+    const cardDismissed = fab.dataset.dismissed === "true";
+    if (cardDismissed) {
+      fab.style.display = "flex";
+    } else {
+      card.style.display = "flex";
+    }
+  }
+}
+
+function dismissCard(e) {
+  e.stopPropagation();
+  const card = document.getElementById("ferdows-card");
+  const fab = document.getElementById("ferdows-fab");
+  card.style.display = "none";
+  fab.style.display = "flex";
+  fab.dataset.dismissed = "true";
+}
+
+window.toggleChat = toggleChat;
+window.dismissCard = dismissCard;
+window.switchTier = switchTier;
+
+// ── tier switch ────────────────────────────────────────────────────────────────
+function switchTier(tier) {
+  currentTier = tier;
+  const model = MODELS[tier];
+
+  document.getElementById("ftier-free").classList.toggle("active", tier === "free");
+  document.getElementById("ftier-plus").classList.toggle("active", tier === "plus");
+
+  const badge = document.getElementById("ferdows-chat-badge-header");
+  badge.textContent = model.badge;
+  badge.style.color = model.color;
+  badge.style.borderColor = model.color + "55";
+  badge.style.background = model.color + "18";
+
+  document.getElementById("ferdows-chat-name").childNodes[0].textContent = model.name + " ";
+  document.getElementById("ferdows-input").placeholder =
+    tier === "plus" ? "از فردوس پلاس بپرس..." : "سوال بپرس...";
+
+  addSystemMsg(
+    tier === "plus"
+      ? "◈ فردوس پلاس فعال شد"
+      : "✦ فردوس فعال شد"
+  );
+}
