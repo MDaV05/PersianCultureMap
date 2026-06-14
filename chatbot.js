@@ -1,5 +1,39 @@
-const OPENROUTER_API_KEY = "";
+// ── ganjoor & helpers ─────────────────────────────────────────────────────
+let ganjoorCache = null;
+let cacheTime = 0;
+const CACHE_DURATION = 3600000; // 1 hour
 
+async function getGanjoorContext(question) {
+  const now = Date.now();
+  if (ganjoorCache && (now - cacheTime) < CACHE_DURATION) {
+    return filterPoets(ganjoorCache, question);
+  }
+  try {
+    const res = await fetch("https://api.ganjoor.net/api/ganjoor/poets");
+    if (!res.ok) return "";
+    ganjoorCache = await res.json();
+    cacheTime = now;
+    return filterPoets(ganjoorCache, question);
+  } catch {
+    return "";
+  }
+}
+
+function filterPoets(poets, question) {
+  const mentioned = poets.filter(p =>
+    question.includes(p.name) ||
+    question.toLowerCase().includes((p.nickName || "").toLowerCase())
+  ).slice(0, 3);
+
+  if (mentioned.length > 0) {
+    return "شاعران مرتبط:\n" + mentioned.map(p =>
+      `- ${p.name}${p.birthYearInLHCalendar ? " (تولد: " + p.birthYearInLHCalendar + ")" : ""}${p.deathYearInLHCalendar ? " (وفات: " + p.deathYearInLHCalendar + ")" : ""}`
+    ).join("\n");
+  }
+  return "شاعران گنجور: " + poets.slice(0, 12).map(p => p.name).join("، ");
+}
+
+// ── models ──────────────────────────────────────────────────────────────
 const MODELS = {
   free: {
     id: "qwen/qwen3-coder-480b-a35b:free",
@@ -20,13 +54,11 @@ const MODELS = {
 let currentTier = "free";
 let chatOpen = false;
 
-//_______________UI_______________________________________________________________________________________________________________________________________
-
+// ── UI builder ──────────────────────────────────────────────────────────────────
 function buildChatbot() {
   const wrapper = document.createElement("div");
   wrapper.id = "ferdows-wrapper";
   wrapper.innerHTML = `
-    <!-- Floating trigger card -->
     <div id="ferdows-card" onclick="toggleChat()">
       <div id="ferdows-avatar">✦</div>
       <div id="ferdows-card-text">
@@ -35,11 +67,7 @@ function buildChatbot() {
       </div>
       <button id="ferdows-close-card" onclick="dismissCard(event)">✕</button>
     </div>
-
-    <!-- Small FAB when card is dismissed -->
     <div id="ferdows-fab" onclick="toggleChat()" style="display:none;">✦</div>
-
-    <!-- Chat window -->
     <div id="ferdows-chat">
       <div id="ferdows-chat-header">
         <div id="ferdows-chat-avatar-small">✦</div>
@@ -49,18 +77,10 @@ function buildChatbot() {
         </div>
         <button id="ferdows-chat-close" onclick="toggleChat()">✕</button>
       </div>
-
-      <!-- Tier toggle -->
       <div id="ferdows-tier-row">
-        <button class="ftier-btn active" id="ftier-free" onclick="switchTier('free')">
-          <span>✦</span> فردوس
-        </button>
-        <button class="ftier-btn" id="ftier-plus" onclick="switchTier('plus')">
-          <span>◈</span> فردوس پلاس
-        </button>
+        <button class="ftier-btn active" id="ftier-free" onclick="switchTier('free')"><span>✦</span> فردوس</button>
+        <button class="ftier-btn" id="ftier-plus" onclick="switchTier('plus')"><span>◈</span> فردوس پلاس</button>
       </div>
-
-      <!-- Messages -->
       <div id="ferdows-messages">
         <div class="fm bot">
           <div class="fm-bubble">
@@ -70,25 +90,20 @@ function buildChatbot() {
           </div>
         </div>
       </div>
-
-      <!-- Input -->
       <div id="ferdows-input-row">
         <input id="ferdows-input" type="text" placeholder="سوال بپرس..." dir="rtl" autocomplete="off"/>
         <button id="ferdows-send">↑</button>
       </div>
     </div>
-
   `;
   document.body.appendChild(wrapper);
 
-  // event listeners
   document.getElementById("ferdows-send").addEventListener("click", sendMessage);
   document.getElementById("ferdows-input").addEventListener("keydown", e => {
     if (e.key === "Enter") sendMessage();
   });
 }
 
-// ── open toggle ────────────────────────────────────────────────────────────────
 function toggleChat() {
   chatOpen = !chatOpen;
   const chat = document.getElementById("ferdows-chat");
@@ -102,21 +117,16 @@ function toggleChat() {
     setTimeout(() => document.getElementById("ferdows-input").focus(), 400);
   } else {
     chat.classList.remove("open");
-    // Show FAB if card was dismissed, otherwise show card
     const cardDismissed = fab.dataset.dismissed === "true";
-    if (cardDismissed) {
-      fab.style.display = "flex";
-    } else {
-      card.style.display = "flex";
-    }
+    if (cardDismissed) fab.style.display = "flex";
+    else card.style.display = "flex";
   }
 }
 
 function dismissCard(e) {
   e.stopPropagation();
-  const card = document.getElementById("ferdows-card");
+  document.getElementById("ferdows-card").style.display = "none";
   const fab = document.getElementById("ferdows-fab");
-  card.style.display = "none";
   fab.style.display = "flex";
   fab.dataset.dismissed = "true";
 }
@@ -125,11 +135,9 @@ window.toggleChat = toggleChat;
 window.dismissCard = dismissCard;
 window.switchTier = switchTier;
 
-// ── tier switch ────────────────────────────────────────────────────────────────
 function switchTier(tier) {
   currentTier = tier;
   const model = MODELS[tier];
-
   document.getElementById("ftier-free").classList.toggle("active", tier === "free");
   document.getElementById("ftier-plus").classList.toggle("active", tier === "plus");
 
@@ -140,41 +148,11 @@ function switchTier(tier) {
   badge.style.background = model.color + "18";
 
   document.getElementById("ferdows-chat-name").childNodes[0].textContent = model.name + " ";
-  document.getElementById("ferdows-input").placeholder =
-    tier === "plus" ? "از فردوس پلاس بپرس..." : "سوال بپرس...";
-
-  addSystemMsg(
-    tier === "plus"
-      ? "◈ فردوس پلاس فعال شد"
-      : "✦ فردوس فعال شد"
-  );
+  document.getElementById("ferdows-input").placeholder = tier === "plus" ? "از فردوس پلاس بپرس..." : "سوال بپرس...";
+  addSystemMsg(tier === "plus" ? "◈ فردوس پلاس فعال شد" : "✦ فردوس فعال شد");
 }
 
-//──────────── ganjoor ────────────────────────────────────────────────────────────────
-
-async function getGanjoorContext(question) {
-  try {
-    const res = await fetch("https://api.ganjoor.net/api/ganjoor/poets");
-    if (!res.ok) return "";
-    const poets = await res.json();
-    const mentioned = poets.filter(p =>
-      question.includes(p.name) ||
-      question.toLowerCase().includes((p.nickName || "").toLowerCase())
-    ).slice(0, 3);
-
-    if (mentioned.length > 0) {
-      return "شاعران مرتبط:\n" + mentioned.map(p =>
-        `- ${p.name}${p.birthYearInLHCalendar ? " (تولد: " + p.birthYearInLHCalendar + ")" : ""}${p.deathYearInLHCalendar ? " (وفات: " + p.deathYearInLHCalendar + ")" : ""}`
-      ).join("\n");
-    }
-    return "شاعران گنجور: " + poets.slice(0, 12).map(p => p.name).join("، ");
-  } catch {
-    return "";
-  }
-}
-
-//──────────── send ──────────────────────────────────────────────────────────────────
-
+// ── send message  ──────────────────────────────────────────
 async function sendMessage() {
   const input = document.getElementById("ferdows-input");
   const question = input.value.trim();
@@ -186,12 +164,10 @@ async function sendMessage() {
 
   addMsg(question, "user");
   const typingId = addTyping();
-
   const model = MODELS[currentTier];
 
   try {
     const context = await getGanjoorContext(question);
-
     const body = {
       model: model.id,
       max_tokens: currentTier === "plus" ? 1200 : 800,
@@ -199,9 +175,7 @@ async function sendMessage() {
         {
           role: "system",
           content: `تو «${model.name}» هستی، دستیار هوش مصنوعی شعر پارسی.
-
 ${context ? "اطلاعات گنجور:\n" + context : ""}
-
 دستورالعمل‌ها:
 - اگر سوال فارسی است به فارسی پاسخ بده، اگر انگلیسی است به انگلیسی
 - پاسخ کوتاه، دقیق، و زیبا
@@ -211,10 +185,7 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
         { role: "user", content: question }
       ]
     };
-
-    if (currentTier === "plus") {
-      body.reasoning = { effort: "none" };
-    }
+    if (currentTier === "plus") body.reasoning = { effort: "none" };
 
     const res = await fetch("https://persianculturemap.modavari005.workers.dev/", {
       method: "POST",
@@ -226,16 +197,44 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
       body: JSON.stringify(body)
     });
 
-    removeTyping(typingId);
-
     if (!res.ok) {
+      removeTyping(typingId);
       const err = await res.json();
       throw new Error(err.error?.message || `HTTP ${res.status}`);
     }
 
-    const data = await res.json();
-    const answer = data.choices?.[0]?.message?.content || "متاسفم، پاسخی دریافت نشد.";
-    addMsg(answer, "bot");
+    // --- STREAMING HANDLER ---
+    const msgDiv = addMsg("", "bot"); // Create empty message
+    const bubble = msgDiv.querySelector(".fm-bubble");
+    removeTyping(typingId);
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullAnswer = "";
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || ""; // Keep incomplete line in buffer
+
+      for (const line of lines) {
+        if (line.startsWith("data: ")) {
+          const data = line.slice(6).trim();
+          if (data === "[DONE]") continue;
+          try {
+            const parsed = JSON.parse(data);
+            const content = parsed.choices?.[0]?.delta?.content || "";
+            fullAnswer += content;
+            bubble.textContent = fullAnswer;
+            document.getElementById("ferdows-messages").scrollTop = document.getElementById("ferdows-messages").scrollHeight;
+          } catch (e) { /* Ignore parse errors */ }
+        }
+      }
+    }
 
   } catch (err) {
     removeTyping(typingId);
@@ -248,7 +247,7 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
   }
 }
 
-//──────────── helpers ────────────────────────────────────────────────────────────────
+// ── helpers ─────────────────────────────────────────────────────────────────────
 function addMsg(text, role) {
   const msgs = document.getElementById("ferdows-messages");
   const div = document.createElement("div");
@@ -259,6 +258,7 @@ function addMsg(text, role) {
   div.appendChild(bubble);
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
+  return div; // CRITICAL: Must return the div for streaming
 }
 
 function addSystemMsg(text) {
