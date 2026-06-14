@@ -254,7 +254,10 @@ function addMsg(text, role) {
   const msgs = document.getElementById("ferdows-messages");
   const div = document.createElement("div");
   div.className = `fm ${role}`;
-  div.innerHTML = `<div class="fm-bubble">${text.replace(/\n/g, "<br>")}</div>`;
+  const bubble = document.createElement("div");
+  bubble.className = "fm-bubble";
+  bubble.textContent = text;
+  div.appendChild(bubble);
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }

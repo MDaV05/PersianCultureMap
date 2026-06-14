@@ -15,6 +15,11 @@
   --text-dim: #6B8585;
   --panel-bg: rgba(253, 251, 247, 0.96);
   --radius: 12px;
+  --gold: #C9A84C;
+  --gold-light: #e0c273;
+  --text-dim: rgba(255, 255, 255, 0.5);
+  --text-light: rgba(255, 255, 255, 0.85);
+  --parchment: #f4e8d1;
   
   --font-fa: "Vazirmatn", sans-serif;
   --font-en: "Cormorant Garamond", "Georgia", serif;
