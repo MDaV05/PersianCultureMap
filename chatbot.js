@@ -1,4 +1,5 @@
-// ── ganjoor & helpers ─────────────────────────────────────────────────────
+// ── ganjoor & helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
 let ganjoorCache = null;
 let cacheTime = 0;
 const CACHE_DURATION = 3600000; // 1 hour
@@ -33,10 +34,11 @@ function filterPoets(poets, question) {
   return "شاعران گنجور: " + poets.slice(0, 12).map(p => p.name).join("، ");
 }
 
-// ── models ──────────────────────────────────────────────────────────────
+// ── models ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
 const MODELS = {
   free: {
-    id: "qwen/qwen3-coder-480b-a35b:free",
+    id: "qwen/qwen3-coder:free",
     name: "فردوس",
     nameEn: "Ferdows",
     badge: "رایگان",
@@ -54,7 +56,9 @@ const MODELS = {
 let currentTier = "free";
 let chatOpen = false;
 
-// ── UI builder ──────────────────────────────────────────────────────────────────
+// ── UI builder ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
 function buildChatbot() {
   const wrapper = document.createElement("div");
   wrapper.id = "ferdows-wrapper";
@@ -136,8 +140,29 @@ window.dismissCard = dismissCard;
 window.switchTier = switchTier;
 
 function switchTier(tier) {
+  // Check if trying to access Plus tier
+  if (tier === "plus") {
+    const hasPlusAccess = localStorage.getItem("ferdows_plus_token");
+    
+    if (!hasPlusAccess) {
+      // Show activation modal
+      showActivationModal();
+      // Don't switch tier
+      return;
+    }
+    
+    // Validate token format (basic check)
+    if (!hasPlusAccess.startsWith("FP-")) {
+      localStorage.removeItem("ferdows_plus_token");
+      showActivationModal("کد فعال‌سازی نامعتبر است");
+      return;
+    }
+  }
+  
+  // If we get here, proceed with tier switch
   currentTier = tier;
   const model = MODELS[tier];
+
   document.getElementById("ftier-free").classList.toggle("active", tier === "free");
   document.getElementById("ftier-plus").classList.toggle("active", tier === "plus");
 
@@ -148,11 +173,167 @@ function switchTier(tier) {
   badge.style.background = model.color + "18";
 
   document.getElementById("ferdows-chat-name").childNodes[0].textContent = model.name + " ";
-  document.getElementById("ferdows-input").placeholder = tier === "plus" ? "از فردوس پلاس بپرس..." : "سوال بپرس...";
-  addSystemMsg(tier === "plus" ? "◈ فردوس پلاس فعال شد" : "✦ فردوس فعال شد");
+  document.getElementById("ferdows-input").placeholder =
+    tier === "plus" ? "از فردوس پلاس بپرس..." : "سوال بپرس...";
+
+  addSystemMsg(
+    tier === "plus"
+      ? "◈ فردوس پلاس فعال شد"
+      : "✦ فردوس فعال شد"
+  );
 }
 
-// ── send message  ──────────────────────────────────────────
+// Add this new function to show the activation modal
+function showActivationModal(message = "") {
+  const modalHTML = `
+    <div id="ferdows-activation-modal" style="
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      backdrop-filter: blur(4px);
+    ">
+      <div style="
+        background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+        border: 2px solid #C9A84C;
+        border-radius: 20px;
+        padding: 32px;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(201,168,76,0.3);
+        text-align: center;
+      ">
+        <div style="
+          width: 64px;
+          height: 64px;
+          background: linear-gradient(135deg, #C9A84C, #8B6914);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 20px;
+          font-size: 32px;
+          box-shadow: 0 0 20px rgba(201,168,76,0.5);
+        ">🔒</div>
+        
+        <h3 style="
+          color: #C9A84C;
+          font-size: 22px;
+          margin-bottom: 12px;
+          font-weight: 700;
+        ">فردوس پلاس</h3>
+        
+        <p style="
+          color: #b0b0b0;
+          font-size: 14px;
+          line-height: 1.8;
+          margin-bottom: 20px;
+        ">
+          برای دسترسی به مدل پیشرفته‌تر، لطفاً کد فعال‌سازی را از ربات بله دریافت کنید
+        </p>
+        
+        ${message ? `<p style="color: #ff6b6b; font-size: 13px; margin-bottom: 16px;">${message}</p>` : ''}
+        
+        <div style="
+          background: rgba(201,168,76,0.1);
+          border: 1px solid rgba(201,168,76,0.3);
+          border-radius: 12px;
+          padding: 16px;
+          margin-bottom: 20px;
+        ">
+          <p style="color: #C9A84C; font-size: 12px; margin-bottom: 8px;">📱 ربات بله:</p>
+          <a href="https://web.bale.ai/@FerdowsBaleBot" target="_blank" style="
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            display: block;
+            padding: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            transition: all 0.2s;
+          ">@FerdowsBaleBot</a>
+        </div>
+        
+        <div style="
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        ">
+          <input type="text" id="plus-activation-code" placeholder="کد فعال‌سازی را وارد کنید" dir="ltr" style="
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(201,168,76,0.3);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 14px;
+            text-align: center;
+            outline: none;
+          " />
+          
+          <button onclick="activatePlus()" style="
+            padding: 12px;
+            background: linear-gradient(135deg, #C9A84C, #8B6914);
+            border: none;
+            border-radius: 8px;
+            color: #0f0d08;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+          ">فعال‌سازی فردوس پلاس</button>
+          
+          <button onclick="document.getElementById('ferdows-activation-modal').remove()" style="
+            padding: 10px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #888;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+          ">بعداً</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+// Add this function to handle activation
+window.activatePlus = function() {
+  const code = document.getElementById('plus-activation-code').value.trim();
+  
+  if (!code) {
+    showActivationModal("لطفاً کد فعال‌سازی را وارد کنید");
+    return;
+  }
+  
+  // For now, we'll just store it - validation will happen in the Worker
+  if (code.startsWith("FP-")) {
+    localStorage.setItem("ferdows_plus_token", code);
+    document.getElementById('ferdows-activation-modal').remove();
+    
+    // Switch to plus tier
+    switchTier('plus');
+    
+    addSystemMsg("✅ کد فعال‌سازی ذخیره شد. در حال بررسی...");
+    
+    // Here you would normally validate with the server
+    // We'll implement this in the next step
+  } else {
+    showActivationModal("کد فعال‌سازی باید با FP- شروع شود");
+  }
+};
+
+// ── send message  ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 async function sendMessage() {
   const input = document.getElementById("ferdows-input");
   const question = input.value.trim();
@@ -192,8 +373,9 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
       headers: {
         "Content-Type": "application/json",
         "HTTP-Referer": window.location.href,
-        "X-Title": encodeURIComponent("فردوس — نقشه‌ی شعر پارسی")
-      },
+        "X-Title": "Ferdows - Persian Poetry Map",
+        "X-Plus-Token": currentTier === "plus" ? (localStorage.getItem("ferdows_plus_token") || "") : ""
+     },
       body: JSON.stringify(body)
     });
 
@@ -247,7 +429,7 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
   }
 }
 
-// ── helpers ─────────────────────────────────────────────────────────────────────
+// ── helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 function addMsg(text, role) {
   const msgs = document.getElementById("ferdows-messages");
   const div = document.createElement("div");

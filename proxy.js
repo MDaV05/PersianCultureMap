@@ -1,17 +1,18 @@
 export default {
   async fetch(request, env) {
+    // Handle CORS preflight - INCLUDE X-Plus-Token in allowed headers
     if (request.method === "OPTIONS") {
       return new Response(null, {
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "POST, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, HTTP-Referer, X-Title",
+          "Access-Control-Allow-Headers": "Content-Type, HTTP-Referer, X-Title, X-Plus-Token",
           "Access-Control-Max-Age": "86400"
         }
       });
     }
 
-    // origin validation
+    // Origin validation
     const allowedOrigins = ["https://chekameh.xyz", "http://localhost:8081"];
     const origin = request.headers.get("HTTP-Referer") || "";
     
@@ -39,7 +40,47 @@ export default {
         });
       }
 
-      // call openrouter
+      // ── PAYWALL VALIDATION ──────────────────────────────────────────────
+      // Check if this is a paid model (not ending with :free)
+      const isPaidModel = !body.model.endsWith(":free");
+      
+      if (isPaidModel) {
+        const userToken = request.headers.get("X-Plus-Token") || "";
+        
+        // Check if token exists
+        if (!userToken) {
+          return new Response(JSON.stringify({ 
+            error: "فردوس پلاس نیاز به کد فعال‌سازی دارد. لطفاً به @FerdowsBaleBot مراجعه کنید." 
+          }), {
+            status: 403,
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+          });
+        }
+        
+        // Basic token format validation (starts with FP-)
+        if (!userToken.startsWith("FP-")) {
+          return new Response(JSON.stringify({ 
+            error: "کد فعال‌سازی نامعتبر است" 
+          }), {
+            status: 403,
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+          });
+        }
+        
+        // TODO: Later, validate token against Cloudflare KV
+        // const isValid = await env.SUBSCRIPTIONS.get(userToken);
+        // if (!isValid) {
+        //   return new Response(JSON.stringify({ 
+        //     error: "کد فعال‌سازی منقضی شده یا نامعتبر است" 
+        //   }), {
+        //     status: 403,
+        //     headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        //   });
+        // }
+      }
+      // ── END PAYWALL VALIDATION ──────────────────────────────────────────
+
+      // Call OpenRouter
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -51,7 +92,7 @@ export default {
         body: JSON.stringify({ ...body, stream: true })
       });
 
-      // openrouter errors
+      // Handle OpenRouter errors
       if (!response.ok) {
         const errData = await response.json();
         return new Response(JSON.stringify(errData), {
@@ -60,7 +101,7 @@ export default {
         });
       }
 
-      // successful response back to the client
+      // Stream successful response back to client
       return new Response(response.body, {
         headers: {
           "Content-Type": "text/event-stream",
