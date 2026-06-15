@@ -195,4 +195,53 @@ function setupUI() {
 }
 
 // Initialize UI when DOM is ready
-document.addEventListener("DOMContentLoaded", setupUI);
+document.addEventListener("DOMContentLoaded", () => {
+  setupUI();
+  handleDeepLink();
+});
+
+function handleDeepLink() {
+  const params = new URLSearchParams(window.location.search);
+
+  const poetId = params.get("poet");
+
+  if (!poetId) {
+    return;
+  }
+
+  console.log("Deep link detected:", poetId);
+
+  for (const city of CITIES) {
+    const poet = city.poets.find(
+      p => p.id === poetId
+    );
+
+    if (!poet) {
+      continue;
+    }
+
+    navigateToPoet(city, poet);
+
+    return;
+  }
+
+  console.warn(`Poet "${poetId}" not found.`);
+}
+
+function navigateToPoet(city, poet) {
+
+  /*
+    Select an era where this city exists.
+  */
+  updateEra(city.eras[0]);
+
+  /*
+    Open city panel.
+  */
+  openCity(city);
+
+  /*
+    Open poet panel.
+  */
+  openPoet(poet, city);
+}
