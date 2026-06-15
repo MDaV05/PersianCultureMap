@@ -637,6 +637,33 @@ body {
   border: 2px solid white;
   box-shadow: 0 0 8px rgba(0, 150, 136, 0.6);
 }
+/* Site Logo - Top Left */
+#site-logo {
+  flex-shrink: 0;
+  margin-left: auto; /* Pushes to left in RTL layout */
+  margin-right: 20px;
+}
+
+#site-logo img {
+  height: 45px;
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  transition: all 0.3s ease;
+}
+
+#site-logo img:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+}
+
+/* Ensure header uses flexbox */
+#header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 20px;
+}
 /* ************************************************************************************************************************************************
                                                                       ferdows
 ************************************************************************************************************************************************ */
