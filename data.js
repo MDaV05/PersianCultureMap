@@ -21,6 +21,7 @@ const CITIES = [
     lat: 39.77, lon: 64.42,
     x: 320, y: 180,
     eras: [0, 1, 2, 3],
+    headerImage: "images/cities/bukhara.jpg",
     poets: [
       {
         id: "rudaki", name: "رودکی", nameEn: "Rudaki", dates: "858 – 941 CE", emoji: "📜",
@@ -45,6 +46,7 @@ const CITIES = [
     lat: 36.27, lon: 59.56,
     x: 380, y: 220,
     eras: [0, 1, 2, 3],
+    headerImage: "images/cities/mashhad.jpg",
     poets: [
       {
         id: "ferdowsi", name: "فردوسی", nameEn: "Ferdowsi", dates: "940 – 1020 CE", emoji: "🦁",
@@ -62,6 +64,7 @@ const CITIES = [
     lat: 36.21, lon: 58.79,
     x: 410, y: 260,
     eras: [1, 2, 3],
+    headerImage: "images/cities/nishapur.jpg",
     poets: [
       {
         id: "khayyam", name: "خیام", nameEn: "Omar Khayyam", dates: "1048 – 1131 CE", emoji: "🌹",
@@ -86,6 +89,7 @@ const CITIES = [
     lat: 29.59, lon: 52.58,
     x: 300, y: 400,
     eras: [2, 3, 4, 5],
+    headerImage: "images/cities/shiraz.jpg",
     poets: [
       {
         id: "saadi", name: "سعدی", nameEn: "Saadi", dates: "1210 – 1292 CE", emoji: "🌺",
@@ -110,6 +114,7 @@ const CITIES = [
     lat: 36.76, lon: 66.90,
     x: 450, y: 240,
     eras: [2, 3],
+    headerImage: "images/cities/balkh.jpg",
     poets: [
       {
         id: "rumi", name: "مولانا", nameEn: "Rumi", dates: "1207 – 1273 CE", emoji: "🌀",
@@ -127,6 +132,7 @@ const CITIES = [
     lat: 39.65, lon: 66.97,
     x: 340, y: 160,
     eras: [0, 1, 4],
+    headerImage: "images/cities/samarkand.jpg",
     poets: [
       {
         id: "jami", name: "جامی", nameEn: "Jami", dates: "1414 – 1492 CE", emoji: "✨",
@@ -144,6 +150,7 @@ const CITIES = [
     lat: 32.66, lon: 51.68,
     x: 350, y: 310,
     eras: [5],
+    headerImage: "images/cities/isfahan.jpg",
     poets: [
       {
         id: "saeb", name: "صائب تبریزی", nameEn: "Saeb Tabrizi", dates: "1601 – 1676 CE", emoji: "🏛️",
