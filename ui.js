@@ -153,7 +153,7 @@ window.openWork = openWork;
 
 // Listen for the map telling the UI to open a city
 document.addEventListener('openCityPanel', (e) => {
-    openCity(e.detail);
+  openCity(e.detail);
 });
 
 function setupTimeline() {
@@ -220,7 +220,15 @@ function handleDeepLink() {
       continue;
     }
 
-    navigateToPoet(city, poet);
+    if (window.mapReady) {
+      navigateToPoet(city, poet);
+    } else {
+      document.addEventListener(
+        "mapReady",
+        () => navigateToPoet(city, poet),
+        { once: true }
+      );
+    }
 
     return;
   }
@@ -229,19 +237,31 @@ function handleDeepLink() {
 }
 
 function navigateToPoet(city, poet) {
-
-  /*
-    Select an era where this city exists.
-  */
   updateEra(city.eras[0]);
 
-  /*
-    Open city panel.
-  */
-  openCity(city);
+  if (window.map) {
+    window.map.flyTo({
+      center: [city.lon, city.lat],
+      zoom: 6.5,
+      speed: 0.8,
+      curve: 1.4,
+      essential: true
+    });
+  }
 
-  /*
-    Open poet panel.
-  */
-  openPoet(poet, city);
-}
+  // Highlight the city's marker
+  markers.forEach(marker => {
+    if (marker.cityData.id === city.id) {
+      marker.getElement().classList.add("deep-link-highlight");
+
+      setTimeout(() => {
+        marker.getElement().classList.remove("deep-link-highlight");
+      }, 3000);
+    }
+  });
+
+  // Open city panel after the fly animation
+  setTimeout(() => {
+    openCity(city);
+  }, 1200);
+} 

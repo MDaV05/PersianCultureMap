@@ -49,7 +49,7 @@ function initializeMap() {
     minZoom: 3,
     maxZoom: 10,
   });
-
+  window.map = map;
   //map.addControl(new maplibregl.NavigationControl(), "bottom-left");──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
   map.on("load", async () => {
@@ -59,6 +59,11 @@ function initializeMap() {
     await loadBorders(STARTING_ERA);
     loadCities();
     updateMarkers(STARTING_ERA);
+    window.mapReady = true;
+
+    document.dispatchEvent(
+          new CustomEvent("mapReady")
+      );
   });
 }
 
