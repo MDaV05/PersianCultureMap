@@ -58,7 +58,6 @@ let chatOpen = false;
 
 // ── UI builder ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-
 function buildChatbot() {
   const wrapper = document.createElement("div");
   wrapper.id = "ferdows-wrapper";
@@ -183,8 +182,11 @@ function switchTier(tier) {
   );
 }
 
-// Add this new function to show the activation modal
+// ── Activation Modal ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 function showActivationModal(message = "") {
+  // 🛑 FIX 1: Remove any existing modal before creating a new one to prevent stacking
+  document.getElementById('ferdows-activation-modal')?.remove(); 
+
   const modalHTML = `
     <div id="ferdows-activation-modal" style="
       position: fixed;
@@ -328,13 +330,10 @@ window.activatePlus = function() {
     localStorage.setItem("ferdows_plus_token", code);
     document.getElementById('ferdows-activation-modal').remove();
     
-    // Switch to plus tier
+    // Switch to plus tier (This already adds the "فعال شد" message)
     switchTier('plus');
     
-    addSystemMsg("✅ کد فعال‌سازی ذخیره شد. در حال بررسی...");
-    
-    // Here you would normally validate with the server
-    // We'll implement this in the next step
+    // 🛑 FIX 2: Removed the duplicate addSystemMsg("✅ کد فعال‌سازی ذخیره شد...")
   } else {
     showActivationModal("کد فعال‌سازی باید با FP- شروع شود");
   }
@@ -388,8 +387,36 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
 
     if (!res.ok) {
       removeTyping(typingId);
-      const err = await res.json();
-      throw new Error(err.error?.message || `HTTP ${res.status}`);
+      let errorMessage = `HTTP ${res.status}`;
+      try {
+        const err = await res.json();
+        errorMessage = err.error?.message || errorMessage;
+      } catch (e) {
+        // Response wasn't JSON, use the HTTP status
+      }
+
+      // 🛑 FIX 3: If the server rejects the token (403), clear it from storage and revert to free
+      if (res.status === 403 && currentTier === "plus") {
+        localStorage.removeItem("ferdows_plus_token");
+        addSystemMsg("⚠️ اشتراک شما نامعتبر یا منقضی شده است. به حالت رایگان برگشتید.");
+        
+        // Automatically switch them back to the free tier
+        currentTier = "free";
+        document.getElementById("ftier-free").classList.add("active");
+        document.getElementById("ftier-plus").classList.remove("active");
+        
+        // Update UI to reflect free tier
+        const freeModel = MODELS.free;
+        const badge = document.getElementById("ferdows-chat-badge-header");
+        badge.textContent = freeModel.badge;
+        badge.style.color = freeModel.color;
+        badge.style.borderColor = freeModel.color + "55";
+        badge.style.background = freeModel.color + "18";
+        document.getElementById("ferdows-chat-name").childNodes[0].textContent = freeModel.name + " ";
+        document.getElementById("ferdows-input").placeholder = "سوال بپرس...";
+      }
+
+      throw new Error(errorMessage);
     }
 
     // --- STREAMING HANDLER ---
@@ -418,11 +445,15 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
             const parsed = JSON.parse(data);
             const content = parsed.choices?.[0]?.delta?.content || "";
             fullAnswer += content;
+            
             if (window.marked) {
-              bubble.innerHTML = marked.parse(fullAnswer);
+              const rawHtml = marked.parse(fullAnswer);
+              // 🛡️ FIX 4: Sanitize HTML to prevent XSS attacks
+              bubble.innerHTML = window.DOMPurify ? DOMPurify.sanitize(rawHtml) : rawHtml;
             } else {
-                bubble.textContent = fullAnswer; // Fallback
+              bubble.textContent = fullAnswer; // Fallback
             }
+            
             document.getElementById("ferdows-messages").scrollTop = document.getElementById("ferdows-messages").scrollHeight;
           } catch (e) { /* Ignore parse errors */ }
         }
@@ -440,7 +471,7 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
   }
 }
 
-// ── helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// ── helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 function addMsg(text, role) {
   const msgs = document.getElementById("ferdows-messages");
   const div = document.createElement("div");
