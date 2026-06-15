@@ -38,7 +38,7 @@ function filterPoets(poets, question) {
 
 const MODELS = {
   free: {
-    id: "qwen/qwen3-coder:free",
+    id: "qwen/qwen3-next-80b-a3b-instruct:free",
     name: "فردوس",
     nameEn: "Ferdows",
     badge: "رایگان",
