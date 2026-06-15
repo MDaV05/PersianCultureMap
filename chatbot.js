@@ -192,7 +192,7 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
       headers: {
         "Content-Type": "application/json",
         "HTTP-Referer": window.location.href,
-        "X-Title": "فردوس — نقشه‌ی شعر پارسی"
+        "X-Title": encodeURIComponent("فردوس — نقشه‌ی شعر پارسی")
       },
       body: JSON.stringify(body)
     });
