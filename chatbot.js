@@ -38,8 +38,8 @@ function filterPoets(poets, question) {
 
 const MODELS = {
   free: {
-    id: "qwen/qwen3-next-80b-a3b-instruct:free",
-    name: "فردوس",
+    id: "openai/gpt-oss-120b:free",
+    name: "فریدون",
     nameEn: "Ferdows",
     badge: "رایگان",
     color: "#C9A84C"
