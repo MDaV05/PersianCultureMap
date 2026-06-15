@@ -4,11 +4,9 @@
 
 let map;
 let markers = [];
+let citiesLoaded = false;
 
-// 🔥 CRITICAL FIX: Match your slider to your file names!
-// If your slider goes 0 to 5, but your files are era_1.geojson, era_2.geojson...
-// Set this to 1. If your files are era_0.geojson, set this to 0.
-const STARTING_ERA = 1; 
+const STARTING_ERA = 0; 
 
 function initializeMap() {
   map = new maplibregl.Map({
@@ -63,6 +61,8 @@ function initializeMap() {
     updateMarkers(STARTING_ERA);
   });
 }
+
+
 
 // ══════════════════════════════════════════
 // BORDERS (Bulletproof Fetch)
@@ -137,6 +137,9 @@ async function loadBorders(eraIndex) {
 // CITIES
 // ══════════════════════════════════════════
 function loadCities() {
+  if (citiesLoaded) return;
+  citiesLoaded = true;
+  
   CITIES.forEach(city => {
     const el = document.createElement("div");
     el.className = "city-marker-html";
@@ -145,7 +148,8 @@ function loadCities() {
       <div class="city-label-text">${city.name}</div>
     `;
 
-    el.addEventListener("click", () => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
       document.dispatchEvent(new CustomEvent("openCityPanel", { detail: city }));
     });
 
@@ -158,10 +162,25 @@ function loadCities() {
   });
 }
 
+function clearMarkers() {
+  markers.forEach(marker => {
+    marker.remove();
+  });
+  markers = [];
+}
+
 function updateMarkers(eraIndex) {
   markers.forEach(marker => {
     const visible = marker.cityData.eras.includes(eraIndex);
-    marker.getElement().style.display = visible ? "flex" : "none";
+    const element = marker.getElement();
+    
+    if (visible) {
+      element.style.display = "flex";
+      element.style.pointerEvents = "auto";
+    } else {
+      element.style.display = "none";
+      element.style.pointerEvents = "none";
+    }
   });
 }
 
