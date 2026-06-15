@@ -630,6 +630,7 @@ body {
   border: 2px solid white;
   box-shadow: 0 0 8px rgba(0, 150, 136, 0.6);
 }
+
 /* Site Logo - Top Left */
 #site-logo {
   flex-shrink: 0;
@@ -657,6 +658,7 @@ body {
   gap: 20px;
   padding: 12px 20px;
 }
+
 /* ************************************************************************************************************************************************
                                                                       ferdows
 ************************************************************************************************************************************************ */
@@ -795,7 +797,6 @@ body {
   z-index: 9999;
   overflow: hidden;
 }
-
 
 #ferdows-chat.open {
   opacity: 1;
@@ -1062,6 +1063,100 @@ body {
   opacity: 0.4;
   cursor: not-allowed;
   transform: none;
+}
+
+/* ── MARKDOWN STYLING FOR CHAT BUBBLES ── */
+
+/* Headers (H1, H2, H3) inside bot bubbles */
+.fm.bot .fm-bubble h1, 
+.fm.bot .fm-bubble h2, 
+.fm.bot .fm-bubble h3 {
+  font-family: 'Estedad', sans-serif;
+  font-size: 15px;       /* Slightly larger than body text */
+  font-weight: 800;
+  color: var(--turquoise-dark);
+  margin: 16px 0 8px 0;
+  border-bottom: 1px solid var(--cream-dark);
+  padding-bottom: 4px;
+  line-height: 1.4;
+}
+
+/* Bold Text */
+.fm.bot .fm-bubble strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* Paragraphs spacing */
+.fm.bot .fm-bubble p {
+  margin-bottom: 10px;
+  line-height: 1.8;
+}
+
+/* Inline Code (e.g., `word`) */
+.fm.bot .fm-bubble code {
+  background: rgba(0, 150, 136, 0.1);
+  color: var(--turquoise-dark);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 13px;
+  direction: ltr; /* Code should always be Left-to-Right */
+  display: inline-block;
+  border: 1px solid rgba(0, 150, 136, 0.2);
+}
+
+/* Code Blocks (``` ... ```) */
+.fm.bot .fm-bubble pre {
+  background: #f9f9f9;
+  border: 1px solid var(--cream-dark);
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  direction: ltr; /* Code blocks are LTR */
+  text-align: left;
+  margin: 12px 0;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.fm.bot .fm-bubble pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #333;
+  font-size: 13px;
+  white-space: pre-wrap; /* Wrap long lines */
+}
+
+/* Lists (Bullets and Numbers) */
+.fm.bot .fm-bubble ul, 
+.fm.bot .fm-bubble ol {
+  padding-right: 20px; /* RTL padding */
+  margin-bottom: 12px;
+}
+
+.fm.bot .fm-bubble li {
+  margin-bottom: 6px;
+  line-height: 1.7;
+}
+
+/* Blockquotes (for citations) */
+.fm.bot .fm-bubble blockquote {
+  border-right: 3px solid var(--gold);
+  padding-right: 12px;
+  margin: 12px 0;
+  color: var(--text-dim);
+  font-style: italic;
+  background: rgba(197, 160, 89, 0.05);
+  border-radius: 0 4px 4px 0;
+  padding: 8px 12px;
+}
+
+/* Horizontal Rules (---) */
+.fm.bot .fm-bubble hr {
+  border: none;
+  border-top: 1px dashed var(--cream-dark);
+  margin: 16px 0;
 }
 
 /* ************************************************************************************************************************************************

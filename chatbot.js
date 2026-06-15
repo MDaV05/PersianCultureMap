@@ -39,7 +39,7 @@ function filterPoets(poets, question) {
 const MODELS = {
   free: {
     id: "openai/gpt-oss-120b:free",
-    name: "فریدون",
+    name: "فردوس",
     nameEn: "Ferdows",
     badge: "رایگان",
     color: "#C9A84C"
@@ -140,7 +140,7 @@ window.dismissCard = dismissCard;
 window.switchTier = switchTier;
 
 function switchTier(tier) {
-  // Check if trying to access Plus tier
+  if (currentTier === tier) return;
   if (tier === "plus") {
     const hasPlusAccess = localStorage.getItem("ferdows_plus_token");
     
@@ -418,7 +418,11 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
             const parsed = JSON.parse(data);
             const content = parsed.choices?.[0]?.delta?.content || "";
             fullAnswer += content;
-            bubble.textContent = fullAnswer;
+            if (window.marked) {
+              bubble.innerHTML = marked.parse(fullAnswer);
+            } else {
+                bubble.textContent = fullAnswer; // Fallback
+            }
             document.getElementById("ferdows-messages").scrollTop = document.getElementById("ferdows-messages").scrollHeight;
           } catch (e) { /* Ignore parse errors */ }
         }
