@@ -189,115 +189,122 @@ function showActivationModal(message = "") {
     <div id="ferdows-activation-modal" style="
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.7);
+      background: rgba(26, 42, 42, 0.8);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 10000;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(8px);
     ">
       <div style="
-        background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
-        border: 2px solid #C9A84C;
-        border-radius: 20px;
-        padding: 32px;
-        max-width: 400px;
+        background: linear-gradient(135deg, #F9F6F0, #EBE4D8);
+        border: 3px solid #009688;
+        border-radius: 24px;
+        padding: 40px;
+        max-width: 420px;
         width: 90%;
-        box-shadow: 0 20px 60px rgba(201,168,76,0.3);
+        box-shadow: 0 32px 80px rgba(0, 150, 136, 0.4);
         text-align: center;
       ">
         <div style="
-          width: 64px;
-          height: 64px;
-          background: linear-gradient(135deg, #C9A84C, #8B6914);
+          width: 80px;
+          height: 80px;
+          background: linear-gradient(135deg, #009688, #00695C);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          margin: 0 auto 20px;
-          font-size: 32px;
-          box-shadow: 0 0 20px rgba(201,168,76,0.5);
+          margin: 0 auto 24px;
+          font-size: 40px;
+          box-shadow: 0 8px 24px rgba(0, 150, 136, 0.4);
         ">🔒</div>
         
         <h3 style="
-          color: #C9A84C;
-          font-size: 22px;
-          margin-bottom: 12px;
-          font-weight: 700;
+          font-family: 'Lalezar', cursive;
+          color: #00695C;
+          font-size: 28px;
+          margin-bottom: 16px;
+          text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         ">فردوس پلاس</h3>
         
         <p style="
-          color: #b0b0b0;
-          font-size: 14px;
-          line-height: 1.8;
-          margin-bottom: 20px;
+          color: #6B8585;
+          font-size: 15px;
+          line-height: 2;
+          margin-bottom: 24px;
+          font-family: 'Vazirmatn', sans-serif;
         ">
           برای دسترسی به مدل پیشرفته‌تر، لطفاً کد فعال‌سازی را از ربات بله دریافت کنید
         </p>
         
-        ${message ? `<p style="color: #ff6b6b; font-size: 13px; margin-bottom: 16px;">${message}</p>` : ''}
+        ${message ? `<p style="color: #d32f2f; font-size: 14px; margin-bottom: 20px; font-weight: 600;">${message}</p>` : ''}
         
         <div style="
-          background: rgba(201,168,76,0.1);
-          border: 1px solid rgba(201,168,76,0.3);
-          border-radius: 12px;
-          padding: 16px;
-          margin-bottom: 20px;
+          background: rgba(0, 150, 136, 0.1);
+          border: 2px solid #009688;
+          border-radius: 16px;
+          padding: 20px;
+          margin-bottom: 24px;
         ">
-          <p style="color: #C9A84C; font-size: 12px; margin-bottom: 8px;">📱 ربات بله:</p>
+          <p style="color: #00695C; font-size: 13px; margin-bottom: 12px; font-weight: 700;">📱 ربات بله:</p>
           <a href="https://web.bale.ai/@FerdowsBaleBot" target="_blank" style="
-            color: #fff;
+            color: white;
             text-decoration: none;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             display: block;
-            padding: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-            transition: all 0.2s;
+            padding: 12px;
+            background: linear-gradient(135deg, #009688, #00695C);
+            border-radius: 12px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+            font-family: 'Vazirmatn', sans-serif;
           ">@FerdowsBaleBot</a>
         </div>
         
         <div style="
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 12px;
         ">
           <input type="text" id="plus-activation-code" placeholder="کد فعال‌سازی را وارد کنید" dir="ltr" style="
             width: 100%;
-            padding: 12px;
-            border: 1px solid rgba(201,168,76,0.3);
-            border-radius: 8px;
-            background: rgba(255,255,255,0.05);
-            color: #fff;
+            padding: 14px;
+            border: 2px solid #EBE4D8;
+            border-radius: 12px;
+            background: white;
+            color: #1A2A2A;
             font-family: 'Vazirmatn', sans-serif;
-            font-size: 14px;
+            font-size: 15px;
             text-align: center;
             outline: none;
+            transition: all 0.2s;
           " />
           
           <button onclick="activatePlus()" style="
-            padding: 12px;
-            background: linear-gradient(135deg, #C9A84C, #8B6914);
+            padding: 14px;
+            background: linear-gradient(135deg, #009688, #00695C);
             border: none;
-            border-radius: 8px;
-            color: #0f0d08;
-            font-family: 'Vazirmatn', sans-serif;
-            font-size: 14px;
-            font-weight: 700;
+            border-radius: 12px;
+            color: white;
+            font-family: 'Lalezar', cursive;
+            font-size: 16px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(0, 150, 136, 0.3);
           ">فعال‌سازی فردوس پلاس</button>
           
           <button onclick="document.getElementById('ferdows-activation-modal').remove()" style="
-            padding: 10px;
+            padding: 12px;
             background: transparent;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            color: #888;
+            border: 2px solid rgba(0, 150, 136, 0.3);
+            border-radius: 12px;
+            color: #6B8585;
             font-family: 'Vazirmatn', sans-serif;
-            font-size: 13px;
+            font-size: 14px;
             cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
           ">بعداً</button>
         </div>
       </div>

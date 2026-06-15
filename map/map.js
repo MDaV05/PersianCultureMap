@@ -52,7 +52,7 @@ function initializeMap() {
     maxZoom: 10,
   });
 
-  map.addControl(new maplibregl.NavigationControl(), "bottom-left");
+  //map.addControl(new maplibregl.NavigationControl(), "bottom-left");──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
   map.on("load", async () => {
     console.log("✓ MapLibre loaded with CartoDB basemap");

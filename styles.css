@@ -1,5 +1,6 @@
 /* ── IMPORTS & FONTS ── */
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Vazirmatn:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Estedad:wght@400;500;600;700;800&display=swap');
 
 :root {
   /* 🎨 MAIN PALETTE: Cream & Persian Turquoise (Abi Firoozeh-i) */
@@ -18,13 +19,16 @@
   --parchment: #f4e8d1;
   
   /* Chatbot-specific dark theme variables (only used in ferdows section) */
-  --chat-text-dim: rgba(255, 255, 255, 0.5);
-  --chat-text-light: rgba(255, 255, 255, 0.85);
-  --chat-gold: #C9A84C;
-  --chat-gold-light: #e0c273;
-  
+  --chat-bg: rgba(249, 246, 240, 0.98);  /* Cream background */
+  --chat-header-bg: rgba(0, 150, 136, 0.95);  /* Turquoise header */
+  --chat-border: rgba(0, 150, 136, 0.3);
+  --chat-text: #1A2A2A;  /* Dark teal text */
+  --chat-text-light: #6B8585;
+  --chat-input-bg: rgba(255, 255, 255, 0.9);
+  --chat-gold: #C5A059;
+
   --font-fa: "Vazirmatn", sans-serif;
-  --font-en: "Cormorant Garamond", "Georgia", serif;
+  --font-en: "Cormorant Garamond", serif;
 }
 
 * {
@@ -134,11 +138,12 @@ body {
 }
 
 #era-years {
-  font-family: var(--font-en);
-  font-size: 13px;
-  color: var(--text-dim);
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--turquoise-dark);
   direction: ltr;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.7px;
 }
 
 #timeline-track {
@@ -214,7 +219,7 @@ body {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: ("./assets/Images/Hotspot.gif");
+  background: url("./assets/Images/Hotspot.gif") center/contain no-repeat;
   border: 2px solid #229799;
   /* box-shadow: 0 0 12px rgba(0, 150, 136, 0.6), 0 0 24px rgba(0, 150, 136, 0.3); */
   animation: pulse-turquoise 3s ease-in-out infinite;
@@ -636,32 +641,29 @@ body {
                                                                       ferdows
 ************************************************************************************************************************************************ */
 
+/* ── CHATBOT WRAPPER ── */
 #ferdows-wrapper {
   position: fixed;
   bottom: 28px;
   left: 28px;
-  z-index: 900;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
+  z-index: 9999;
 }
 
-/* ── trigger card ── */
+/* ── TRIGGER CARD ── */
 #ferdows-card {
+  font-family: 'Estedad', sans-serif;
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(12,10,6,0.95);
-  border: 1px solid rgba(201,168,76,0.25);
+  background: var(--chat-bg);
+  border: 2px solid var(--turquoise);
   border-radius: 16px;
   padding: 14px 16px;
   cursor: pointer;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.08);
+  box-shadow: 0 8px 32px rgba(0, 150, 136, 0.2);
   backdrop-filter: blur(20px);
-  transition: all 0.2s;
-  max-width: 260px;
-  animation: cardPop 0.5s cubic-bezier(0.16,1,0.3,1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 280px;
 }
 
 @keyframes cardPop {
@@ -670,51 +672,49 @@ body {
 }
 
 #ferdows-card:hover {
-  border-color: rgba(201,168,76,0.45);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 20px rgba(201,168,76,0.1);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 150, 136, 0.3);
+  border-color: var(--turquoise-dark);
 }
 
 #ferdows-avatar {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #C9A84C, #8B6914);
+  background: linear-gradient(135deg, var(--turquoise), var(--turquoise-dark));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  color: #0f0d08;
+  font-size: 24px;
+  color: white;
   font-weight: 700;
-  flex-shrink: 0;
-  box-shadow: 0 0 16px rgba(201,168,76,0.4);
+  box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
 }
 
 #ferdows-card-text { flex: 1; }
 
 #ferdows-card-name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--gold);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 2px;
+  color: var(--turquoise-dark);
+  font-family: 'Estedad', sans-serif;
+  font-weight: 800;
 }
 
 #ferdows-card-badge {
-  font-size: 9px;
-  background: rgba(201,168,76,0.15);
-  border: 1px solid rgba(201,168,76,0.25);
-  color: var(--gold);
-  padding: 1px 6px;
+  font-size: 10px;
+  background: var(--turquoise);
+  color: white;
+  padding: 3px 10px;
   border-radius: 10px;
-  letter-spacing: 1px;
+  margin-right: 6px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0,150,136,0.3);
 }
 
 #ferdows-card-sub {
-  font-size: 11px;
-  color: var(--chat-text-dim);  /* Changed from text-dim */
+  font-size: 12px;
+  color: var(--text-dim);
 }
 
 #ferdows-close-card {
@@ -755,25 +755,27 @@ body {
 
 /* ── chat window ── */
 #ferdows-chat {
+  font-family: 'Estedad', sans-serif;
   position: fixed;
   bottom: 28px;
   left: 28px;
-  width: 380px;
-  height: 560px;
-  background: rgba(10,8,4,0.97);
-  border: 1px solid rgba(201,168,76,0.18);
+  width: 400px;
+  height: 600px;
+  background: var(--chat-bg);
+  border: 2px solid var(--turquoise-light);
   border-radius: 20px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 24px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,168,76,0.06);
+  box-shadow: 0 24px 80px rgba(0, 150, 136, 0.25);
   backdrop-filter: blur(24px);
   opacity: 0;
   pointer-events: none;
   transform: translateY(20px) scale(0.96);
-  transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
-  z-index: 800;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 9999;
   overflow: hidden;
 }
+
 
 #ferdows-chat.open {
   opacity: 1;
@@ -783,112 +785,115 @@ body {
 
 /* Chat header */
 #ferdows-chat-header {
-  padding: 16px 18px;
-  border-bottom: 1px solid rgba(201,168,76,0.1);
+  padding: 18px 20px;
+  border-bottom: 2px solid var(--turquoise-light);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-shrink: 0;
-  background: rgba(201,168,76,0.03);
+  background: var(--chat-header-bg);
 }
 
 #ferdows-chat-avatar-small {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #C9A84C, #8B6914);
+  background: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  color: #0f0d08;
+  font-size: 20px;
+  color: var(--turquoise);
   font-weight: 700;
-  flex-shrink: 0;
 }
 
 #ferdows-chat-header-text { flex: 1; }
 
 #ferdows-chat-name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--gold);
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  color: white;
+  font-family: 'Estedad', sans-serif;
 }
 
 #ferdows-chat-badge-header {
-  font-size: 9px;
-  padding: 1px 7px;
-  border-radius: 10px;
-  border: 1px solid rgba(201,168,76,0.3);
-  background: rgba(201,168,76,0.12);
-  color: var(--chat-gold);  /* Changed from gold */
-  letter-spacing: 0.5px;
-  transition: all 0.3s;
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.25);
+  color: white;
+  margin-right: 6px;
+  font-weight: 700;
+  backdrop-filter: blur(4px);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 #ferdows-chat-subtitle {
-  font-size: 10px;
-  color: var(--text-dim);
-  margin-top: 1px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.9);
 }
 
 #ferdows-chat-close {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: var(--text-dim);
-  width: 28px;
-  height: 28px;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  margin-right: auto;
 }
 
 #ferdows-chat-close:hover {
-  color: var(--parchment);
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.3);
+  transform: rotate(90deg);
 }
 
 /* Tier toggle */
 #ferdows-tier-row {
   display: flex;
-  gap: 6px;
-  padding: 10px 14px;
-  border-bottom: 1px solid rgba(201,168,76,0.07);
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--cream-dark);
   flex-shrink: 0;
+  background: white;
 }
 
 .ftier-btn {
   flex: 1;
-  padding: 7px 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.06);
-  background: rgba(255,255,255,0.03);
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 2px solid var(--cream-dark);
+  background: white;
   color: var(--text-dim);
-  font-family: 'Vazirmatn', sans-serif;
-  font-size: 12px;
+  font-family: 'Estedad', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
 }
 
 .ftier-btn:hover {
-  border-color: rgba(201,168,76,0.2);
-  color: var(--gold-light);
+  border-color: var(--turquoise-light);
+  color: var(--turquoise);
+  background: rgba(0, 150, 136, 0.05);
 }
 
 .ftier-btn.active {
-  background: rgba(201,168,76,0.12);
-  border-color: rgba(201,168,76,0.3);
-  color: var(--chat-gold-light);  /* Changed from gold-light */
+  background: linear-gradient(135deg, var(--turquoise), var(--turquoise-dark));
+  border-color: var(--turquoise);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
 }
 
 #ftier-plus.active {
@@ -901,12 +906,11 @@ body {
 #ferdows-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(201,168,76,0.15) transparent;
+  gap: 10px;
+  background: linear-gradient(180deg, rgba(249,246,240,0.5) 0%, rgba(235,228,216,0.3) 100%);
 }
 
 .fm { display: flex; flex-direction: column; }
@@ -914,25 +918,28 @@ body {
 .fm.bot { align-items: flex-end; }
 
 .fm-bubble {
-  max-width: 86%;
-  padding: 9px 13px;
-  font-size: 13px;
-  line-height: 1.75;
+  max-width: 85%;
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.8;
   direction: rtl;
+  border-radius: 16px;
+  font-family: 'Estedad', sans-serif;
 }
 
 .fm.user .fm-bubble {
-  background: rgba(201,168,76,0.1);
-  border: 1px solid rgba(201,168,76,0.18);
-  color: var(--parchment);
-  border-radius: 14px 14px 4px 14px;
+  background: linear-gradient(135deg, var(--turquoise), var(--turquoise-dark));
+  color: white;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 150, 136, 0.2);
 }
 
 .fm.bot .fm-bubble {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.07);
-  color: var(--chat-text-light);  /* Changed from text-light */
-  border-radius: 14px 14px 14px 4px;
+  background: white;
+  color: var(--text-main);
+  border: 1px solid var(--cream-dark);
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .fm-system {
@@ -974,50 +981,69 @@ body {
 
 /* Input */
 #ferdows-input-row {
-  padding: 12px 14px;
-  border-top: 1px solid rgba(201,168,76,0.08);
+  padding: 16px;
+  border-top: 2px solid var(--cream-dark);
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
+  background: white;
 }
 
 #ferdows-input {
   flex: 1;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(201,168,76,0.18);
-  border-radius: 10px;
-  padding: 9px 13px;
-  color: var(--parchment);
-  font-family: 'Vazirmatn', sans-serif;
-  font-size: 13px;
+  background: var(--cream);
+  border: 2px solid var(--cream-dark);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--text-main);
+  font-family: 'Estedad', sans-serif;
+  font-size: 14px;
   outline: none;
   direction: rtl;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
 }
 
 #ferdows-input:focus {
-  border-color: rgba(201,168,76,0.45);
-  background: rgba(255,255,255,0.07);
+  border-color: var(--turquoise);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(0, 150, 136, 0.1);
 }
 
 #ferdows-input:disabled { opacity: 0.5; }
 
 #ferdows-send {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #C9A84C, #8B6914);
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--turquoise), var(--turquoise-dark));
   border: none;
-  color: #0f0d08;
-  font-size: 16px;
+  color: white;
+  font-size: 20px;
   font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: opacity 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
 }
 
-#ferdows-send:hover { opacity: 0.85; }
-#ferdows-send:disabled { opacity: 0.4; cursor: not-allowed; }
+#ferdows-send:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 150, 136, 0.4);
+}
+
+#ferdows-send:active {
+  transform: translateY(0) scale(0.98);
+}
+
+#ferdows-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ************************************************************************************************************************************************
+                                                                      dark mode
+************************************************************************************************************************************************ */
