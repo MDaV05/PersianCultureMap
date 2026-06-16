@@ -140,6 +140,7 @@ function updateEra(idx) {
   document.getElementById("era-badge").textContent = `${era.name} · ${era.nameEn}`;
 
   const slider = document.getElementById("timeline-slider");
+  slider.value = idx;
   const pct = (idx / (ERAS.length - 1)) * 100;
   slider.style.setProperty("--pct", pct + "%");
 
