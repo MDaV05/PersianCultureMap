@@ -228,6 +228,7 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   flex-direction: column;
   align-items: center;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  
 }
 
 .city-marker-html[style*="display: none"] {
@@ -291,15 +292,14 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 80px 24px 24px;
-  background: rgba(26, 42, 42, 0.3);
-  /* Dark teal dimming */
+  padding: 80px 24px 0px;
+  background: rgba(26, 42, 42, 0.3); /* Dark teal dimming */
   backdrop-filter: blur(3px);
 }
 
 #overlay.active {
   display: flex;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.2s ease;
 }
 
 @keyframes fadeIn {
@@ -353,8 +353,17 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   }
 }
 
+/* ── PANEL HEADER IMAGE ── */
+#panel-header-img {
+  width: 100%;
+  height: 220px; /* Adjust this height to your liking (e.g., 180px, 250px) */
+  object-fit: cover; /* Ensures the image fills the space without stretching */
+  border-radius: 11px 11px 0 0; /* Rounded top corners (11px fits perfectly inside the 12px panel border) */
+  display: none; /* Hidden by default until a city with an image is clicked */
+}
+
 #panel-header {
-  padding: 24px 28px 20px;
+  padding:  10px 28px 8px;
   border-bottom: 1px solid var(--cream-dark);
   display: flex;
   align-items: flex-start;
@@ -432,9 +441,7 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   font-style: italic;
 }
 
-#panel-body {
-  padding: 24px 28px 32px;
-}
+#panel-body { padding: 24px 28px 18px; }
 
 /* ── POET CARDS ── */
 .poet-card {
