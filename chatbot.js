@@ -38,7 +38,7 @@ function filterPoets(poets, question) {
 
 const MODELS = {
   free: {
-    id: "qwen/qwen3-coder:free",
+    id: "openai/gpt-oss-120b:free",
     name: "فردوس",
     nameEn: "Ferdows",
     badge: "رایگان",
@@ -58,18 +58,17 @@ let chatOpen = false;
 
 // ── UI builder ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-
 function buildChatbot() {
   const wrapper = document.createElement("div");
   wrapper.id = "ferdows-wrapper";
   wrapper.innerHTML = `
-    <div id="ferdows-card" onclick="toggleChat()">
-      <div id="ferdows-avatar">✦</div>
-      <div id="ferdows-card-text">
-        <div id="ferdows-card-name">فردوس <span id="ferdows-card-badge">AI</span></div>
-        <div id="ferdows-card-sub">از شعر پارسی بپرس</div>
-      </div>
-      <button id="ferdows-close-card" onclick="dismissCard(event)">✕</button>
+      <div id="ferdows-card" onclick="toggleChat()">
+        <div class="d-none d-lg-flex align-items-center text-center" id="ferdows-avatar">✦</div>
+        <div id="ferdows-card-text">
+          <div  id="ferdows-card-name">فردوس <span id="ferdows-card-badge">AI</span></div>
+          <div class="d-none d-lg-inline" id="ferdows-card-sub">از شعر پارسی بپرس</div>
+        </div>
+        <button id="ferdows-close-card" onclick="dismissCard(event)">✕</button>
     </div>
     <div id="ferdows-fab" onclick="toggleChat()" style="display:none;">✦</div>
     <div id="ferdows-chat">
@@ -140,17 +139,17 @@ window.dismissCard = dismissCard;
 window.switchTier = switchTier;
 
 function switchTier(tier) {
-  // Check if trying to access Plus tier
+  if (currentTier === tier) return;
   if (tier === "plus") {
     const hasPlusAccess = localStorage.getItem("ferdows_plus_token");
-    
+
     if (!hasPlusAccess) {
       // Show activation modal
       showActivationModal();
       // Don't switch tier
       return;
     }
-    
+
     // Validate token format (basic check)
     if (!hasPlusAccess.startsWith("FP-")) {
       localStorage.removeItem("ferdows_plus_token");
@@ -158,7 +157,7 @@ function switchTier(tier) {
       return;
     }
   }
-  
+
   // If we get here, proceed with tier switch
   currentTier = tier;
   const model = MODELS[tier];
@@ -183,8 +182,11 @@ function switchTier(tier) {
   );
 }
 
-// Add this new function to show the activation modal
+// ── Activation Modal ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 function showActivationModal(message = "") {
+  // 🛑 FIX 1: Remove any existing modal before creating a new one to prevent stacking
+  document.getElementById('ferdows-activation-modal')?.remove(); 
+
   const modalHTML = `
     <div id="ferdows-activation-modal" style="
       position: fixed;
@@ -310,31 +312,28 @@ function showActivationModal(message = "") {
       </div>
     </div>
   `;
-  
+
   document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
 // Add this function to handle activation
-window.activatePlus = function() {
+window.activatePlus = function () {
   const code = document.getElementById('plus-activation-code').value.trim();
-  
+
   if (!code) {
     showActivationModal("لطفاً کد فعال‌سازی را وارد کنید");
     return;
   }
-  
+
   // For now, we'll just store it - validation will happen in the Worker
   if (code.startsWith("FP-")) {
     localStorage.setItem("ferdows_plus_token", code);
     document.getElementById('ferdows-activation-modal').remove();
-    
-    // Switch to plus tier
+
+    // Switch to plus tier (This already adds the "فعال شد" message)
     switchTier('plus');
     
-    addSystemMsg("✅ کد فعال‌سازی ذخیره شد. در حال بررسی...");
-    
-    // Here you would normally validate with the server
-    // We'll implement this in the next step
+    // 🛑 FIX 2: Removed the duplicate addSystemMsg("✅ کد فعال‌سازی ذخیره شد...")
   } else {
     showActivationModal("کد فعال‌سازی باید با FP- شروع شود");
   }
@@ -382,14 +381,42 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
         "HTTP-Referer": window.location.href,
         "X-Title": "Ferdows - Persian Poetry Map",
         "X-Plus-Token": currentTier === "plus" ? (localStorage.getItem("ferdows_plus_token") || "") : ""
-     },
+      },
       body: JSON.stringify(body)
     });
 
     if (!res.ok) {
       removeTyping(typingId);
-      const err = await res.json();
-      throw new Error(err.error?.message || `HTTP ${res.status}`);
+      let errorMessage = `HTTP ${res.status}`;
+      try {
+        const err = await res.json();
+        errorMessage = err.error?.message || errorMessage;
+      } catch (e) {
+        // Response wasn't JSON, use the HTTP status
+      }
+
+      // 🛑 FIX 3: If the server rejects the token (403), clear it from storage and revert to free
+      if (res.status === 403 && currentTier === "plus") {
+        localStorage.removeItem("ferdows_plus_token");
+        addSystemMsg("⚠️ اشتراک شما نامعتبر یا منقضی شده است. به حالت رایگان برگشتید.");
+        
+        // Automatically switch them back to the free tier
+        currentTier = "free";
+        document.getElementById("ftier-free").classList.add("active");
+        document.getElementById("ftier-plus").classList.remove("active");
+        
+        // Update UI to reflect free tier
+        const freeModel = MODELS.free;
+        const badge = document.getElementById("ferdows-chat-badge-header");
+        badge.textContent = freeModel.badge;
+        badge.style.color = freeModel.color;
+        badge.style.borderColor = freeModel.color + "55";
+        badge.style.background = freeModel.color + "18";
+        document.getElementById("ferdows-chat-name").childNodes[0].textContent = freeModel.name + " ";
+        document.getElementById("ferdows-input").placeholder = "سوال بپرس...";
+      }
+
+      throw new Error(errorMessage);
     }
 
     // --- STREAMING HANDLER ---
@@ -405,7 +432,7 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      
+
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split("\n");
       buffer = lines.pop() || ""; // Keep incomplete line in buffer
@@ -418,7 +445,15 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
             const parsed = JSON.parse(data);
             const content = parsed.choices?.[0]?.delta?.content || "";
             fullAnswer += content;
-            bubble.textContent = fullAnswer;
+            
+            if (window.marked) {
+              const rawHtml = marked.parse(fullAnswer);
+              // 🛡️ FIX 4: Sanitize HTML to prevent XSS attacks
+              bubble.innerHTML = window.DOMPurify ? DOMPurify.sanitize(rawHtml) : rawHtml;
+            } else {
+              bubble.textContent = fullAnswer; // Fallback
+            }
+            
             document.getElementById("ferdows-messages").scrollTop = document.getElementById("ferdows-messages").scrollHeight;
           } catch (e) { /* Ignore parse errors */ }
         }
@@ -436,7 +471,7 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
   }
 }
 
-// ── helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// ── helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 function addMsg(text, role) {
   const msgs = document.getElementById("ferdows-messages");
   const div = document.createElement("div");
