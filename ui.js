@@ -140,6 +140,7 @@ function updateEra(idx) {
   document.getElementById("era-badge").textContent = `${era.name} · ${era.nameEn}`;
 
   const slider = document.getElementById("timeline-slider");
+  slider.value = idx;
   const pct = (idx / (ERAS.length - 1)) * 100;
   slider.style.setProperty("--pct", pct + "%");
 
@@ -217,4 +218,73 @@ function setupUI() {
 }
 
 // Initialize UI when DOM is ready
-document.addEventListener("DOMContentLoaded", setupUI);
+document.addEventListener("DOMContentLoaded", () => {
+  setupUI();
+  handleDeepLink();
+});
+
+function handleDeepLink() {
+  const params = new URLSearchParams(window.location.search);
+
+  const poetId = params.get("poet");
+
+  if (!poetId) {
+    return;
+  }
+
+  console.log("Deep link detected:", poetId);
+
+  for (const city of CITIES) {
+    const poet = city.poets.find(
+      p => p.id === poetId
+    );
+
+    if (!poet) {
+      continue;
+    }
+
+    if (window.mapReady) {
+      navigateToPoet(city, poet);
+    } else {
+      document.addEventListener(
+        "mapReady",
+        () => navigateToPoet(city, poet),
+        { once: true }
+      );
+    }
+
+    return;
+  }
+
+  console.warn(`Poet "${poetId}" not found.`);
+}
+
+function navigateToPoet(city, poet) {
+  updateEra(city.eras[0]);
+
+  if (window.map) {
+    window.map.flyTo({
+      center: [city.lon, city.lat],
+      zoom: 6.5,
+      speed: 0.8,
+      curve: 1.4,
+      essential: true
+    });
+  }
+
+  // Highlight the city's marker
+  markers.forEach(marker => {
+    if (marker.cityData.id === city.id) {
+      marker.getElement().classList.add("deep-link-highlight");
+
+      setTimeout(() => {
+        marker.getElement().classList.remove("deep-link-highlight");
+      }, 3000);
+    }
+  });
+
+  // Open city panel after the fly animation
+  setTimeout(() => {
+    openCity(city);
+  }, 1200);
+} 
