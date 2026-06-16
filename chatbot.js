@@ -63,13 +63,13 @@ function buildChatbot() {
   const wrapper = document.createElement("div");
   wrapper.id = "ferdows-wrapper";
   wrapper.innerHTML = `
-    <div id="ferdows-card" onclick="toggleChat()">
-      <div id="ferdows-avatar">✦</div>
-      <div id="ferdows-card-text">
-        <div id="ferdows-card-name">فردوس <span id="ferdows-card-badge">AI</span></div>
-        <div id="ferdows-card-sub">از شعر پارسی بپرس</div>
-      </div>
-      <button id="ferdows-close-card" onclick="dismissCard(event)">✕</button>
+      <div id="ferdows-card" onclick="toggleChat()">
+        <div class="d-none d-lg-flex align-items-center text-center" id="ferdows-avatar">✦</div>
+        <div id="ferdows-card-text">
+          <div  id="ferdows-card-name">فردوس <span id="ferdows-card-badge">AI</span></div>
+          <div class="d-none d-lg-inline" id="ferdows-card-sub">از شعر پارسی بپرس</div>
+        </div>
+        <button id="ferdows-close-card" onclick="dismissCard(event)">✕</button>
     </div>
     <div id="ferdows-fab" onclick="toggleChat()" style="display:none;">✦</div>
     <div id="ferdows-chat">
@@ -143,14 +143,14 @@ function switchTier(tier) {
   // Check if trying to access Plus tier
   if (tier === "plus") {
     const hasPlusAccess = localStorage.getItem("ferdows_plus_token");
-    
+
     if (!hasPlusAccess) {
       // Show activation modal
       showActivationModal();
       // Don't switch tier
       return;
     }
-    
+
     // Validate token format (basic check)
     if (!hasPlusAccess.startsWith("FP-")) {
       localStorage.removeItem("ferdows_plus_token");
@@ -158,7 +158,7 @@ function switchTier(tier) {
       return;
     }
   }
-  
+
   // If we get here, proceed with tier switch
   currentTier = tier;
   const model = MODELS[tier];
@@ -310,29 +310,29 @@ function showActivationModal(message = "") {
       </div>
     </div>
   `;
-  
+
   document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
 // Add this function to handle activation
-window.activatePlus = function() {
+window.activatePlus = function () {
   const code = document.getElementById('plus-activation-code').value.trim();
-  
+
   if (!code) {
     showActivationModal("لطفاً کد فعال‌سازی را وارد کنید");
     return;
   }
-  
+
   // For now, we'll just store it - validation will happen in the Worker
   if (code.startsWith("FP-")) {
     localStorage.setItem("ferdows_plus_token", code);
     document.getElementById('ferdows-activation-modal').remove();
-    
+
     // Switch to plus tier
     switchTier('plus');
-    
+
     addSystemMsg("✅ کد فعال‌سازی ذخیره شد. در حال بررسی...");
-    
+
     // Here you would normally validate with the server
     // We'll implement this in the next step
   } else {
@@ -382,7 +382,7 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
         "HTTP-Referer": window.location.href,
         "X-Title": "Ferdows - Persian Poetry Map",
         "X-Plus-Token": currentTier === "plus" ? (localStorage.getItem("ferdows_plus_token") || "") : ""
-     },
+      },
       body: JSON.stringify(body)
     });
 
@@ -405,7 +405,7 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      
+
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split("\n");
       buffer = lines.pop() || ""; // Keep incomplete line in buffer
