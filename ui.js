@@ -154,6 +154,28 @@ window.openWork = openWork;
 
 // Listen for the map telling the UI to open a city
 document.addEventListener('openCityPanel', (e) => {
+    const city = e.detail;
+  const panel = document.getElementById("panel");
+  const panelHeader = document.getElementById("panel-header");
+    if (panel && panelHeader) {
+    // 1. Find the image element, or create it if it doesn't exist yet
+    let headerImg = document.getElementById("panel-header-img");
+    if (!headerImg) {
+      headerImg = document.createElement("img");
+      headerImg.id = "panel-header-img";
+      
+      // Insert it right before the panel-header
+      panel.insertBefore(headerImg, panelHeader);
+    }
+
+    // 2. Set the image source and show it
+    if (city.headerImage) {
+      headerImg.src = city.headerImage;
+      headerImg.style.display = "block";
+    } else {
+      headerImg.style.display = "none"; // Hide it if the city has no image
+    }
+  }
   openCity(e.detail);
 });
 
