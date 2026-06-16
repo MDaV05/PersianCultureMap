@@ -307,8 +307,8 @@ body {
 }
 
 #panel {
-  background: var(--panel-bg);
-  border: 1px solid var(--turquoise-light);
+  background: #F5F5F5;
+  border: 1px solid #229799;
   border-radius: var(--radius);
   width: 100%;
   max-width: 640px;
@@ -356,7 +356,7 @@ body {
   gap: 16px;
   position: sticky;
   top: 0;
-  background: rgba(253, 251, 247, 0.95);
+  background: #F5F5F5;
   backdrop-filter: blur(12px);
   z-index: 2;
 }
