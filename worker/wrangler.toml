@@ -1,0 +1,11 @@
+name = "persianculturemap"
+main = "proxy.js"
+compatibility_date = "2026-06-14"
+
+[observability]
+enabled = true
+
+[[kv_namespaces]]
+binding = "SUBSCRIPTIONS"
+id = "bb78a29fae274e23ae5c1735481976ad"
+

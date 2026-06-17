@@ -1,4 +1,4 @@
-// ══════════════════════════════════════════
+// ═════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════
 let currentEra = 0;
@@ -71,23 +71,31 @@ function renderPanel({ type, data, city, poet }, showBack) {
     eyebrow.textContent = "شهر · CITY";
     title.textContent = data.name;
     subtitle.textContent = data.nameEn + " · " + era.nameEn;
+    
+    const poets = data.poets.filter(p => !p.eras || p.eras.includes(currentEra));
 
-    const poets = data.poets;
-    body.innerHTML = poets
-      .map(
-        (p) => `
-      <div class="poet-card" onclick="openPoet(${JSON.stringify(p).replace(/"/g, "&quot;")}, ${JSON.stringify(data).replace(/"/g, "&quot;")})">
-        <div class="poet-avatar">${p.emoji}</div>
-        <div class="poet-info">
-          <div class="poet-name">${p.name}</div>
-          <div class="poet-name-en">${p.nameEn}</div>
-          <div class="poet-dates">${p.dates}</div>
+    if (poets.length === 0) {
+      body.innerHTML = `
+        <p style="text-align:center; color:var(--text-dim); padding:40px 20px; font-size:15px; line-height:1.8;">
+          شاعری برای «${era.name}» در این شهر ثبت نشده است.
+        </p>`;
+    } else {
+      body.innerHTML = poets
+        .map(
+          (p) => `
+        <div class="poet-card" onclick="openPoet(${JSON.stringify(p).replace(/"/g, "&quot;")}, ${JSON.stringify(data).replace(/"/g, "&quot;")})">
+          <div class="poet-avatar">${p.emoji}</div>
+          <div class="poet-info">
+            <div class="poet-name">${p.name}</div>
+            <div class="poet-name-en">${p.nameEn}</div>
+            <div class="poet-dates">${p.dates}</div>
+          </div>
+          <div class="poet-arrow">←</div>
         </div>
-        <div class="poet-arrow">←</div>
-      </div>
-    `,
-      )
-      .join("");
+      `,
+        )
+        .join("");
+    }
   } else if (type === "poet") {
     eyebrow.textContent = "شاعر · POET";
     title.textContent = data.name;
@@ -140,6 +148,7 @@ function updateEra(idx) {
   document.getElementById("era-badge").textContent = `${era.name} · ${era.nameEn}`;
 
   const slider = document.getElementById("timeline-slider");
+  slider.value = idx;
   const pct = (idx / (ERAS.length - 1)) * 100;
   slider.style.setProperty("--pct", pct + "%");
 
@@ -153,6 +162,28 @@ window.openWork = openWork;
 
 // Listen for the map telling the UI to open a city
 document.addEventListener('openCityPanel', (e) => {
+    const city = e.detail;
+  const panel = document.getElementById("panel");
+  const panelHeader = document.getElementById("panel-header");
+    if (panel && panelHeader) {
+    // 1. Find the image element, or create it if it doesn't exist yet
+    let headerImg = document.getElementById("panel-header-img");
+    if (!headerImg) {
+      headerImg = document.createElement("img");
+      headerImg.id = "panel-header-img";
+      
+      // Insert it right before the panel-header
+      panel.insertBefore(headerImg, panelHeader);
+    }
+
+    // 2. Set the image source and show it
+    if (city.headerImage) {
+      headerImg.src = city.headerImage;
+      headerImg.style.display = "block";
+    } else {
+      headerImg.style.display = "none"; // Hide it if the city has no image
+    }
+  }
   openCity(e.detail);
 });
 
