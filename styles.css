@@ -131,11 +131,11 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
 
 /* ── TIMELINE ── */
 #timeline-wrap {
-  /* flex: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px; */
-  /* max-width: 600px; */
+  gap: 8px;
+  max-width: 600px;
 }
 
 #era-label {

@@ -67,16 +67,15 @@ export default {
           });
         }
         
-        // TODO: Later, validate token against Cloudflare KV
-        // const isValid = await env.SUBSCRIPTIONS.get(userToken);
-        // if (!isValid) {
-        //   return new Response(JSON.stringify({ 
-        //     error: "کد فعال‌سازی منقضی شده یا نامعتبر است" 
-        //   }), {
-        //     status: 403,
-        //     headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
-        //   });
-        // }
+         const isValid = await env.SUBSCRIPTIONS.get(userToken);
+         if (!isValid) {
+        return new Response(JSON.stringify({ 
+            error: "کد فعال‌سازی منقضی شده یا نامعتبر است" 
+           }), {
+             status: 403,
+             headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+           });
+         }
       }
       // ── END PAYWALL VALIDATION ──────────────────────────────────────────
 
