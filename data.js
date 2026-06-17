@@ -20,7 +20,7 @@ const CITIES = [
     nameEn: "Bukhara",
     lat: 39.77, lon: 64.42,
     x: 320, y: 180,
-    eras: [0, 1, 2, 3],
+    eras: [0],
     poets: [
       {
         id: "rudaki", name: "رودکی", nameEn: "Rudaki", dates: "858 – 941 CE", emoji: "📜",
@@ -44,7 +44,7 @@ const CITIES = [
     nameEn: "Tus / Mashhad",
     lat: 36.27, lon: 59.56,
     x: 380, y: 220,
-    eras: [0, 1, 2, 3],
+    eras: [0, 1],
     poets: [
       {
         id: "ferdowsi", name: "فردوسی", nameEn: "Ferdowsi", dates: "940 – 1020 CE", emoji: "🦁",
@@ -61,7 +61,7 @@ const CITIES = [
     nameEn: "Nishapur",
     lat: 36.21, lon: 58.79,
     x: 410, y: 260,
-    eras: [1, 2, 3],
+    eras: [1],
     poets: [
       {
         id: "khayyam", name: "خیام", nameEn: "Omar Khayyam", dates: "1048 – 1131 CE", emoji: "🌹",
@@ -85,17 +85,19 @@ const CITIES = [
     nameEn: "Shiraz",
     lat: 29.59, lon: 52.58,
     x: 300, y: 400,
-    eras: [2, 3, 4, 5],
+    eras: [2, 3],
     poets: [
       {
-        id: "saadi", name: "سعدی", nameEn: "Saadi", dates: "1210 – 1292 CE", emoji: "🌺",
+        id: "saadi",
+        eras: [2], name: "سعدی", nameEn: "Saadi", dates: "1210 – 1292 CE", emoji: "🌺",
         bio: "سعدی شیرازی، استاد سخن.",
         works: [
           { name: "گلستان", nameEn: "Gulistan", desc: "اثر منثور", lines: ["بنی آدم اعضای یک پیکرند"] }
         ]
       },
       {
-        id: "hafez", name: "حافظ", nameEn: "Hafez", dates: "1315 – 1390 CE", emoji: "🌙",
+        id: "hafez",
+        eras: [3], name: "حافظ", nameEn: "Hafez", dates: "1315 – 1390 CE", emoji: "🌙",
         bio: "حافظ شیرازی، لسان‌الغیب.",
         works: [
           { name: "دیوان حافظ", nameEn: "Divan of Hafez", desc: "غزل‌های لطیف", lines: ["الا یا ایها الساقی ادر کاساً و ناولها"] }
@@ -126,7 +128,7 @@ const CITIES = [
     nameEn: "Samarkand",
     lat: 39.65, lon: 66.97,
     x: 340, y: 160,
-    eras: [0, 1, 4],
+    eras: [4],
     poets: [
       {
         id: "jami", name: "جامی", nameEn: "Jami", dates: "1414 – 1492 CE", emoji: "✨",
