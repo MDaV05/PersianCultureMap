@@ -76,9 +76,11 @@ body {
   left: 0;
   right: 0;
   z-index: 1000;
-  padding: 8px 20px;
+  padding: 15px;
+  background: #48CFCB;
   background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153, 0.7) 100%);
-  margin: 20 20px 0 20px;
+  margin: 20px 20px 0 20px;
+  /* border: 2px solid #229799; */
   border-radius: 50px;
   box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
   backdrop-filter: blur(16px);
@@ -1150,7 +1152,7 @@ body {
   direction: ltr;
   text-align: left;
   margin: 12px 0;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .fm.bot .fm-bubble pre code {
