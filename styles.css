@@ -94,16 +94,15 @@ body {
 
 /* ── HEADER ── */
 .navbar {
-  /* position: fixed;
+  position: fixed; /* 🔥 FIX: Uncommented so z-index works! */
   top: 0;
   left: 0;
-  right: 0; */
+  right: 0;
   z-index: 1000;
   padding: 15px;
   background: #48CFCB;
-background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153, 0.7) 100%);
+  background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153, 0.7) 100%);
   margin: 10px 20px 0 20px;
-  /* border: 2px solid #229799; */
   border-radius: 50px;
   box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
 }
@@ -170,6 +169,8 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
 
 #timeline-slider {
   -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
   height: 4px;
   background: #096386;
   background: linear-gradient(90deg, rgba(9, 99, 134, 1) 0%, rgba(12, 8, 76, 1) 100%);
@@ -192,6 +193,29 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
 }
 
 #timeline-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 6px rgba(0, 150, 136, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: var(--gold);
+}
+
+#timeline-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--cream);
+  border: 3px solid var(--turquoise);
+  box-shadow: 0 0 0 4px rgba(0, 150, 136, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
+  cursor: grab;
+  transition: all 0.2s ease;
+}
+
+#timeline-slider::-moz-range-track {
+  height: 4px;
+  background: linear-gradient(90deg, rgba(9, 99, 134, 1) 0%, rgba(12, 8, 76, 1) 100%);
+  border-radius: 2px;
+}
+
+#timeline-slider::-moz-range-thumb:hover {
   transform: scale(1.1);
   box-shadow: 0 0 0 6px rgba(0, 150, 136, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
   border-color: var(--gold);
