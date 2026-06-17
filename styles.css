@@ -71,42 +71,18 @@ body {
 
 /* ── HEADER (Fixed Layout) ── */
 .navbar {
-  position: fixed;
+  /* position: fixed;
   top: 0;
   left: 0;
-  right: 0;
+  right: 0; */
   z-index: 1000;
   padding: 15px;
   background: #48CFCB;
-  background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153, 0.7) 100%);
-  margin: 20px 20px 0 20px;
+background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153, 0.7) 100%);
+  margin: 10px 20px 0 20px;
   /* border: 2px solid #229799; */
   border-radius: 50px;
   box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
-  backdrop-filter: blur(16px);
-  
-  /* 🔥 FIX: Proper flexbox layout for RTL */
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-#site-logo {
-  flex-shrink: 0;
-}
-
-#site-logo img {
-  height: 65px;
-  width: auto;
-  display: block;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-  transition: all 0.3s ease;
-  margin-left: 20px;
-}
-
-#site-logo img:hover {
-  transform: scale(1.05);
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
 }
 
 #header-title h1 {
@@ -132,12 +108,11 @@ body {
 
 /* ── TIMELINE ── */
 #timeline-wrap {
-  width: 50%;
+  /* flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-width: 0; /* 🔥 FIX: Allows flex item to shrink below content size */
-  margin-right: 20px;
+  gap: 8px; */
+  /* max-width: 600px; */
 }
 
 #era-label {
@@ -149,6 +124,7 @@ body {
 
 #era-name {
   font-size: 15px;
+  /* color: var(--turquoise-dark); */
   font-weight: 700;
 }
 
@@ -156,24 +132,28 @@ body {
   font-family: 'Cormorant Garamond', serif;
   font-weight: 700;
   font-size: 16px;
+  /* color: var(--turquoise-dark); */
+  /* direction: ltr; */
   letter-spacing: 0.7px;
 }
 
 #timeline-track {
+  /* position: relative; */
   height: 32px;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
 }
 
 #timeline-slider {
   -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
   height: 4px;
+  background: #096386;
   background: linear-gradient(90deg, rgba(9, 99, 134, 1) 0%, rgba(12, 8, 76, 1) 100%);
   border-radius: 2px;
   outline: none;
   cursor: pointer;
+  /* direction: ltr; */
 }
 
 #timeline-slider::-webkit-slider-thumb {
@@ -189,30 +169,6 @@ body {
 }
 
 #timeline-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 0 6px rgba(0, 150, 136, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-color: var(--gold);
-}
-
-/* Firefox Support */
-#timeline-slider::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--cream);
-  border: 3px solid var(--turquoise);
-  box-shadow: 0 0 0 4px rgba(0, 150, 136, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
-  cursor: grab;
-  transition: all 0.2s ease;
-}
-
-#timeline-slider::-moz-range-track {
-  height: 4px;
-  background: linear-gradient(90deg, rgba(9, 99, 134, 1) 0%, rgba(12, 8, 76, 1) 100%);
-  border-radius: 2px;
-}
-
-#timeline-slider::-moz-range-thumb:hover {
   transform: scale(1.1);
   box-shadow: 0 0 0 6px rgba(0, 150, 136, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
   border-color: var(--gold);

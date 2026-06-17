@@ -26,9 +26,9 @@
 
   <!-- HEADER -->
 <!-- HEADER -->
-<nav class="navbar" id="header">
-  <div id="site-logo">
-    <img src="./assets/Images/logo-vector.png" alt="Logo">
+<!-- <nav class="navbar d-flex justify-content-between px-5" id="header">
+  <div class="d-none d-md-inline" id="site-logo">
+    <img class="d-none d-md-inline" src="./assets/Images/logo-vector.png" alt="Logo">
   </div>
   
   <div id="timeline-wrap">
@@ -40,7 +40,30 @@
       <input class="w-100" type="range" id="timeline-slider" dir="ltr" min="0" max="5" value="0" step="1" />
     </div>
   </div>
-</nav>
+</nav> -->
+
+<nav class="navbar">
+    <div class="container">
+      <div class="row w-100 d-flex align-items-center">
+        <div class="col d-none d-md-inline">
+          <img class="img-fluid" width="70px" src="./assets/Images/logo-vector.png" alt="Bootstrap">
+        </div>
+        <div class="col">
+          <div class="navbar-nav">
+            <div id="timeline-wrap">
+              <div id="era-label">
+                <span class="lalezar" id="era-name">دوره‌ی سامانی</span>
+                <span class="fw-bold" id="era-years" dir="ltr">875 – 1000 CE</span>
+              </div>
+              <div id="timeline-track">
+                <input class="w-100" type="range" id="timeline-slider" dir="ltr" min="0" max="5" value="0" step="1" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
 
   <!-- MAP -->
   <div id="map-container"></div>
