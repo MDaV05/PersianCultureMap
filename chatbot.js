@@ -244,7 +244,7 @@ function showActivationModal(message = "") {
           margin-bottom: 24px;
         ">
           <p style="color: #00695C; font-size: 13px; margin-bottom: 12px; font-weight: 700;">📱 ربات بله:</p>
-          <a href="https://web.bale.ai/@FerdowsBaleBot" target="_blank" style="
+          <a href="https://web.bale.ai/@FerdowsBaleBot?start=pay" target="_blank" style="
             color: white;
             text-decoration: none;
             font-size: 18px;
