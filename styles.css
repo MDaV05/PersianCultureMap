@@ -101,8 +101,8 @@ body {
   z-index: 1000;
   padding: 15px;
   background: #48CFCB;
-background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153, 0.7) 100%);
-  margin: 10px 20px 0 20px;
+  background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153, 0.7) 100%);
+  margin: 20px 20px 0 20px;
   /* border: 2px solid #229799; */
   border-radius: 50px;
   box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
@@ -278,9 +278,9 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
 }
 
 .city-marker-html.deep-link-highlight .city-dot {
-    transform: scale(2);
-    box-shadow: 0 0 20px gold;
-    transition: all 0.4s ease;
+  transform: scale(2);
+  box-shadow: 0 0 20px gold;
+  transition: all 0.4s ease;
 }
 
 /* ── OVERLAY PANEL ── */
@@ -1196,11 +1196,12 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
 /* ── MARKDOWN STYLING FOR CHAT BUBBLES ── */
 
 /* Headers (H1, H2, H3) inside bot bubbles */
-.fm.bot .fm-bubble h1, 
-.fm.bot .fm-bubble h2, 
+.fm.bot .fm-bubble h1,
+.fm.bot .fm-bubble h2,
 .fm.bot .fm-bubble h3 {
   font-family: 'Estedad', sans-serif;
-  font-size: 15px;       /* Slightly larger than body text */
+  font-size: 15px;
+  /* Slightly larger than body text */
   font-weight: 800;
   color: var(--turquoise-dark);
   margin: 16px 0 8px 0;
@@ -1229,7 +1230,8 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   border-radius: 4px;
   font-family: monospace;
   font-size: 13px;
-  direction: ltr; /* Code should always be Left-to-Right */
+  direction: ltr;
+  /* Code should always be Left-to-Right */
   display: inline-block;
   border: 1px solid rgba(0, 150, 136, 0.2);
 }
@@ -1241,10 +1243,11 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   padding: 12px;
   border-radius: 8px;
   overflow-x: auto;
-  direction: ltr; /* Code blocks are LTR */
+  direction: ltr;
+  /* Code blocks are LTR */
   text-align: left;
   margin: 12px 0;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .fm.bot .fm-bubble pre code {
@@ -1253,13 +1256,15 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   padding: 0;
   color: #333;
   font-size: 13px;
-  white-space: pre-wrap; /* Wrap long lines */
+  white-space: pre-wrap;
+  /* Wrap long lines */
 }
 
 /* Lists (Bullets and Numbers) */
-.fm.bot .fm-bubble ul, 
+.fm.bot .fm-bubble ul,
 .fm.bot .fm-bubble ol {
-  padding-right: 20px; /* RTL padding */
+  padding-right: 20px;
+  /* RTL padding */
   margin-bottom: 12px;
 }
 
