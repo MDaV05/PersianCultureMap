@@ -7,4 +7,5 @@ enabled = true
 
 [[kv_namespaces]]
 binding = "SUBSCRIPTIONS"
-id = "d03044e5359d429493066bfa18a58385"
+id = "bb78a29fae274e23ae5c1735481976ad"
+
