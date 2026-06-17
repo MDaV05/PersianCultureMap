@@ -14,12 +14,16 @@ export default {
         active: true,
         messages_used: 0,
         message_limit: body.limit || 100,
-        expires_at: Date.now() + (body.months * 30 * 24 * 3600 * 1000),
+        expires_at: Date.now() + ((body.months || 1) * 30 * 24 * 3600 * 1000),
         created_at: Date.now()
       };
 
       // Store as object (KV handles JSON serialization automatically)
-      await env.SUBSCRIPTIONS.put(body.token, subscriptionData);
+      await env.SUBSCRIPTIONS.put(
+        body.token,
+        JSON.stringify(subscriptionData)
+      
+      );
 
       return new Response(JSON.stringify({ success: true, token: body.token }), {
         headers: { "Content-Type": "application/json" }
@@ -61,7 +65,7 @@ export default {
       }
 
       const isPaidModel = !body.model.endsWith(":free");
-      const userIP = request.headers.get("CF-Connecting-IP"); // Cloudflare's real IP header
+      const userIP = request.headers.get("CF-Connecting-IP") || "unknown"; // Cloudflare's real IP header
 
       // ── 3. FREE TIER RATE LIMITING (4 requests/day) ──
       if (!isPaidModel) {
@@ -89,7 +93,7 @@ export default {
         // Increment count and set KV to auto-delete at end of day + 1 hour
         limitData.count += 1;
         const ttlSeconds = Math.ceil((endOfDay - Date.now()) / 1000) + 3600;
-        await env.SUBSCRIPTIONS.put(freeLimitKey, limitData, { expirationTtl: ttlSeconds });
+        await env.SUBSCRIPTIONS.put(freeLimitKey, JSON.stringify(limitData), { expirationTtl: ttlSeconds });
       }
 
       // ── 4. PAID TIER VALIDATION ──
@@ -141,7 +145,7 @@ export default {
       // ── 6. UPDATE PAID USAGE (Only if paid and successful) ──
       if (isPaidModel && tokenData) {
         tokenData.messages_used += 1;
-        await env.SUBSCRIPTIONS.put(request.headers.get("X-Plus-Token"), tokenData);
+        await env.SUBSCRIPTIONS.put(request.headers.get("X-Plus-Token"), JSON.stringify(tokenData));
       }
 
       // Stream successful response back to client
