@@ -15,6 +15,8 @@
 This website provides an interactive map showcasing the influence and spread of Persian poetry throughout history and geography. Navigate through different eras of Persian culture, explore important cities, and discover renowned poets and their masterpieces.
 
 **Experience it live at [chekameh.xyz](https://chekameh.xyz/)**
+**Check out the documentation website for more info [docs.chekameh.xyz](https://docs.chekameh.xyz/)**
+
 
 ### 🚀 Getting Started
 
