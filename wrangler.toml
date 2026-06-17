@@ -1,0 +1,6 @@
+name = "persianculturemap"
+main = "proxy.js"
+compatibility_date = "2026-06-14"
+
+[observability]
+enabled = true
