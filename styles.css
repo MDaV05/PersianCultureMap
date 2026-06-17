@@ -222,7 +222,7 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
 .city-marker-html {
   position: relative;
   cursor: pointer;
-  pointer-events: none;
+  pointer-events: auto;
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -230,10 +230,12 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.city-dot, 
-.city-label-text {
-  pointer-events: auto; 
-} 
+.maplibregl-marker {
+  position: absolute;
+  width: auto !important;
+  height: auto !important;
+  /* MapLibre sets top/left via transform, but does NOT set width by default */
+}
 
 .city-marker-html[style*="display: none"] {
   pointer-events: none !important;
@@ -244,7 +246,6 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
 }
 
 .city-dot {
-  cursor: pointer;
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -275,12 +276,12 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   font-weight: 700;
   color: var(--turquoise-dark);
   text-shadow: 0 1px 4px rgba(255, 255, 255, 0.9);
+  pointer-events: none;
   background: rgba(253, 251, 247, 0.85);
   padding: 3px 10px;
   border-radius: 6px;
   border: 1px solid var(--turquoise-light);
   backdrop-filter: blur(4px);
-  cursor: pointer;
 }
 
 .city-marker-html.deep-link-highlight .city-dot {
