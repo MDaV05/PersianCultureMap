@@ -1,41 +1,26 @@
 # 🗺️ Persian Poetry Map
 
-<div align="center">
+An interactive exploration of Persian poetry's influence across time and geography.
 
-**An interactive exploration of Persian poetry's influence across time and geography**
+**Live Site:** [chekameh.xyz](https://chekameh.xyz/)  
+**Documentation:** [docs.chekameh.xyz](https://docs.chekameh.xyz/)
 
-![Persian Poetry Map](https://img.shields.io/badge/Persian_Poetry-Map-blue?style=for-the-badge)
-![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
-[![Website](https://img.shields.io/badge/website-chekameh.xyz-brightgreen?style=for-the-badge)](https://chekameh.xyz/)
+## Overview
 
-</div>
+Persian Poetry Map is an interactive web application that visualizes the historical spread and cultural impact of Persian poetry throughout different eras and regions. Navigate through timelines, explore influential poets and works, and discover the geographical reach of Persian literary heritage.
 
-### About the Project
+## Features
 
-This website provides an interactive map showcasing the influence and spread of Persian poetry throughout history and geography. Navigate through different eras of Persian culture, explore important cities, and discover renowned poets and their masterpieces.
+- **Interactive Timeline** – Explore Persian poetry across different historical periods
+- **Geographical Visualization** – Discover the influence of Persian culture across regions
+- **Detailed Information** – Learn about poets, works, and historical context
+- **Responsive Design** – Optimized for desktop and mobile browsing
+- **Integrated Chatbot** – Interactive assistant for exploration guidance
 
-**Experience it live at [chekameh.xyz](https://chekameh.xyz/)**
-**Check out the documentation website for more info [docs.chekameh.xyz](https://docs.chekameh.xyz/)**
+## Tech Stack
 
+- **Frontend:** HTML5, CSS3, JavaScript (ES6+)
+- **Build Tools:** Node.js, npm
+- **Hosting:** GitHub Pages (chekameh.xyz)
 
-### 🚀 Getting Started
-
-```bash
-# Install dependencies
-npm install
-
-# Open index.html in your browser
-# Or use a local server
-```
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-<div align="center">
-
-**Made with ❤️ for Persian Culture & Literature**
-
-</div>
+## Project Structure
