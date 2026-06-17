@@ -144,13 +144,10 @@ function switchTier(tier) {
     const hasPlusAccess = localStorage.getItem("ferdows_plus_token");
 
     if (!hasPlusAccess) {
-      // Show activation modal
       showActivationModal();
-      // Don't switch tier
       return;
     }
 
-    // Validate token format (basic check)
     if (!hasPlusAccess.startsWith("FP-")) {
       localStorage.removeItem("ferdows_plus_token");
       showActivationModal("کد فعال‌سازی نامعتبر است");
@@ -158,7 +155,6 @@ function switchTier(tier) {
     }
   }
 
-  // If we get here, proceed with tier switch
   currentTier = tier;
   const model = MODELS[tier];
 
@@ -184,7 +180,6 @@ function switchTier(tier) {
 
 // ── Activation Modal ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 function showActivationModal(message = "") {
-  // 🛑 FIX 1: Remove any existing modal before creating a new one to prevent stacking
   document.getElementById('ferdows-activation-modal')?.remove(); 
 
   const modalHTML = `
@@ -316,7 +311,6 @@ function showActivationModal(message = "") {
   document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-// Add this function to handle activation
 window.activatePlus = function () {
   const code = document.getElementById('plus-activation-code').value.trim();
 
@@ -325,21 +319,16 @@ window.activatePlus = function () {
     return;
   }
 
-  // For now, we'll just store it - validation will happen in the Worker
   if (code.startsWith("FP-")) {
     localStorage.setItem("ferdows_plus_token", code);
     document.getElementById('ferdows-activation-modal').remove();
-
-    // Switch to plus tier (This already adds the "فعال شد" message)
     switchTier('plus');
-    
-    // 🛑 FIX 2: Removed the duplicate addSystemMsg("✅ کد فعال‌سازی ذخیره شد...")
   } else {
     showActivationModal("کد فعال‌سازی باید با FP- شروع شود");
   }
 };
 
-// ── send message  ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// ── send message ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 async function sendMessage() {
   const input = document.getElementById("ferdows-input");
   const question = input.value.trim();
@@ -385,27 +374,31 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
       body: JSON.stringify(body)
     });
 
+    // ── ERROR HANDLING ──
     if (!res.ok) {
       removeTyping(typingId);
       let errorMessage = `HTTP ${res.status}`;
       try {
         const err = await res.json();
-        errorMessage = err.error?.message || errorMessage;
-      } catch (e) {
-        // Response wasn't JSON, use the HTTP status
+        // The proxy returns { error: "string" }
+        errorMessage = err.error || err.error?.message || errorMessage;
+      } catch (e) {}
+
+      // 1. Handle Free Tier Daily Limit (429)
+      if (res.status === 429 && currentTier === "free") {
+        addSystemMsg(`⚠️ ${errorMessage}`);
+        return; // Exit gracefully, the finally block will re-enable the input
       }
 
-      // 🛑 FIX 3: If the server rejects the token (403), clear it from storage and revert to free
+      // 2. Handle Invalid/Expired Paid Token (403)
       if (res.status === 403 && currentTier === "plus") {
         localStorage.removeItem("ferdows_plus_token");
         addSystemMsg("⚠️ اشتراک شما نامعتبر یا منقضی شده است. به حالت رایگان برگشتید.");
         
-        // Automatically switch them back to the free tier
         currentTier = "free";
         document.getElementById("ftier-free").classList.add("active");
         document.getElementById("ftier-plus").classList.remove("active");
         
-        // Update UI to reflect free tier
         const freeModel = MODELS.free;
         const badge = document.getElementById("ferdows-chat-badge-header");
         badge.textContent = freeModel.badge;
@@ -414,13 +407,16 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
         badge.style.background = freeModel.color + "18";
         document.getElementById("ferdows-chat-name").childNodes[0].textContent = freeModel.name + " ";
         document.getElementById("ferdows-input").placeholder = "سوال بپرس...";
+        return;
       }
 
-      throw new Error(errorMessage);
+      // 3. Handle other generic errors
+      addMsg(`خطا: ${errorMessage}`, "bot");
+      return;
     }
 
     // --- STREAMING HANDLER ---
-    const msgDiv = addMsg("", "bot"); // Create empty message
+    const msgDiv = addMsg("", "bot");
     const bubble = msgDiv.querySelector(".fm-bubble");
     removeTyping(typingId);
 
@@ -435,7 +431,7 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
 
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split("\n");
-      buffer = lines.pop() || ""; // Keep incomplete line in buffer
+      buffer = lines.pop() || "";
 
       for (const line of lines) {
         if (line.startsWith("data: ")) {
@@ -448,10 +444,9 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
             
             if (window.marked) {
               const rawHtml = marked.parse(fullAnswer);
-              // 🛡️ FIX 4: Sanitize HTML to prevent XSS attacks
               bubble.innerHTML = window.DOMPurify ? DOMPurify.sanitize(rawHtml) : rawHtml;
             } else {
-              bubble.textContent = fullAnswer; // Fallback
+              bubble.textContent = fullAnswer;
             }
             
             document.getElementById("ferdows-messages").scrollTop = document.getElementById("ferdows-messages").scrollHeight;
@@ -462,7 +457,8 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
 
   } catch (err) {
     removeTyping(typingId);
-    addMsg(`خطا: ${err.message}`, "bot");
+    // Only show error if it's a complete network failure (fetch failed before getting a response)
+    addMsg(`خطا: اتصال برقرار نشد. لطفاً اینترنت خود را بررسی کنید.`, "bot");
     console.error(err);
   } finally {
     input.disabled = false;
@@ -482,7 +478,7 @@ function addMsg(text, role) {
   div.appendChild(bubble);
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
-  return div; // CRITICAL: Must return the div for streaming
+  return div;
 }
 
 function addSystemMsg(text) {

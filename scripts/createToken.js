@@ -1,18 +1,18 @@
-export function generateToken() {
+    export function generateToken() {
 
-    const chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        const chars =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-    let code = "FP-";
+        let code = "FP-";
 
-    for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 8; i++) {
 
-        code += chars[
-            Math.floor(
-                Math.random() * chars.length
-            )
-        ];
+            code += chars[
+                Math.floor(
+                    Math.random() * chars.length
+                )
+            ];
+        }
+
+        return code;
     }
-
-    return code;
-}

@@ -1,45 +1,32 @@
 export default {
   async fetch(request, env) {
+    // ── 1. BALE BOT WEBHOOK: Create Subscription ──
     if (request.url.endsWith("/create-subscription")) {
-
-      if (
-        request.headers.get("Authorization")
-        !== env.WORKER_SECRET
-      ) {
-
-        return new Response(
-          "Unauthorized",
-          { status: 403 }
-        );
-
+      if (request.headers.get("Authorization") !== env.WORKER_SECRET) {
+        return new Response("Unauthorized", { status: 403 });
       }
 
       const body = await request.json();
+      
+      // Standardized schema matching validateToken.js
+      const subscriptionData = {
+        user_id: body.user_id,
+        active: true,
+        messages_used: 0,
+        message_limit: body.limit || 100,
+        expires_at: Date.now() + (body.months * 30 * 24 * 3600 * 1000),
+        created_at: Date.now()
+      };
 
-      await env.SUBSCRIPTIONS.put(
-        body.token,
-        JSON.stringify({
-          user_id: body.user_id,
-          used: 0,
-          limit: body.limit,
-          expires_at:
-            Date.now()
-            +
-            body.months
-            *
-            30
-            *
-            24
-            *
-            3600
-            *
-            1000
-        })
-      );
+      // Store as object (KV handles JSON serialization automatically)
+      await env.SUBSCRIPTIONS.put(body.token, subscriptionData);
 
-      return new Response("OK");
+      return new Response(JSON.stringify({ success: true, token: body.token }), {
+        headers: { "Content-Type": "application/json" }
+      });
     }
-    // Handle CORS preflight - INCLUDE X-Plus-Token in allowed headers
+
+    // ── 2. CORS & Origin Validation ──
     if (request.method === "OPTIONS") {
       return new Response(null, {
         headers: {
@@ -51,10 +38,8 @@ export default {
       });
     }
 
-    // Origin validation
     const allowedOrigins = ["https://chekameh.xyz", "http://localhost:8081"];
     const origin = request.headers.get("HTTP-Referer") || "";
-
     if (!allowedOrigins.some(o => origin.startsWith(o))) {
       return new Response(JSON.stringify({ error: "Unauthorized origin" }), {
         status: 403,
@@ -63,15 +48,11 @@ export default {
     }
 
     if (request.method !== "POST") {
-      return new Response("Method not allowed", {
-        status: 405,
-        headers: { "Access-Control-Allow-Origin": "*" }
-      });
+      return new Response("Method not allowed", { status: 405, headers: { "Access-Control-Allow-Origin": "*" } });
     }
 
     try {
       const body = await request.json();
-
       if (!body.model || !body.messages) {
         return new Response(JSON.stringify({ error: "Missing model or messages" }), {
           status: 400,
@@ -79,80 +60,65 @@ export default {
         });
       }
 
-      // ── PAYWALL VALIDATION ──────────────────────────────────────────────
-      // Check if this is a paid model (not ending with :free)
       const isPaidModel = !body.model.endsWith(":free");
+      const userIP = request.headers.get("CF-Connecting-IP"); // Cloudflare's real IP header
 
+      // ── 3. FREE TIER RATE LIMITING (4 requests/day) ──
+      if (!isPaidModel) {
+        const freeLimitKey = `free_limit:${userIP}`;
+        const today = new Date();
+        const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).getTime();
+        
+        let limitData = await env.SUBSCRIPTIONS.get(freeLimitKey, { type: "json" });
+        
+        // Reset counter if it's a new day
+        if (!limitData || limitData.reset_at < Date.now()) {
+          limitData = { count: 0, reset_at: endOfDay };
+        }
+        
+        // Enforce 4 requests/day limit
+        if (limitData.count >= 4) {
+          return new Response(JSON.stringify({ 
+            error: "سقف استفاده روزانه رایگان (۴ پیام) تمام شده است. برای ادامه، فردوس پلاس را فعال کنید." 
+          }), {
+            status: 429, // 429 Too Many Requests
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+          });
+        }
+        
+        // Increment count and set KV to auto-delete at end of day + 1 hour
+        limitData.count += 1;
+        const ttlSeconds = Math.ceil((endOfDay - Date.now()) / 1000) + 3600;
+        await env.SUBSCRIPTIONS.put(freeLimitKey, limitData, { expirationTtl: ttlSeconds });
+      }
+
+      // ── 4. PAID TIER VALIDATION ──
+      let tokenData = null;
       if (isPaidModel) {
         const userToken = request.headers.get("X-Plus-Token") || "";
-
-        // Check if token exists
-        if (!userToken) {
-          return new Response(JSON.stringify({
-            error: "فردوس پلاس نیاز به کد فعال‌سازی دارد. لطفاً به @FerdowsBaleBot مراجعه کنید."
-          }), {
+        if (!userToken || !userToken.startsWith("FP-")) {
+          return new Response(JSON.stringify({ error: "فردوس پلاس نیاز به کد فعال‌سازی دارد." }), {
             status: 403,
             headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
           });
         }
 
-        // Basic token format validation (starts with FP-)
-        if (!userToken.startsWith("FP-")) {
-          return new Response(JSON.stringify({
-            error: "کد فعال‌سازی نامعتبر است"
-          }), {
-            status: 403,
-            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
-          });
-        }
-
-        const tokenData = await env.SUBSCRIPTIONS.get(
-          userToken,
-          { type: "json" }
-        );
-
+        tokenData = await env.SUBSCRIPTIONS.get(userToken, { type: "json" });
         if (!tokenData) {
-          return new Response(JSON.stringify({
-            error: "کد فعال‌سازی نامعتبر است"
-          }), {
-            status: 403,
-            headers: {
-              "Content-Type": "application/json",
-              "Access-Control-Allow-Origin": "*"
-            }
-          });
+          return new Response(JSON.stringify({ error: "کد فعال‌سازی یافت نشد." }), { status: 403, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
         }
-
+        if (!tokenData.active) {
+          return new Response(JSON.stringify({ error: "اشتراک غیرفعال است." }), { status: 403, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
+        }
         if (Date.now() > tokenData.expires_at) {
-          return new Response(JSON.stringify({
-            error: "اشتراک شما منقضی شده است"
-          }), {
-            status: 403,
-            headers: {
-              "Content-Type": "application/json",
-              "Access-Control-Allow-Origin": "*"
-            }
-          });
+          return new Response(JSON.stringify({ error: "اشتراک شما منقضی شده است." }), { status: 403, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
         }
-
-        if (
-          tokenData.limit !== -1 &&
-          tokenData.used >= tokenData.limit
-        ) {
-          return new Response(JSON.stringify({
-            error: "سهمیه فردوس پلاس شما تمام شده است"
-          }), {
-            status: 403,
-            headers: {
-              "Content-Type": "application/json",
-              "Access-Control-Allow-Origin": "*"
-            }
-          });
+        if (tokenData.message_limit !== -1 && tokenData.messages_used >= tokenData.message_limit) {
+          return new Response(JSON.stringify({ error: "سهمیه پیام‌های فردوس پلاس شما تمام شده است." }), { status: 403, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
         }
       }
-      // ── END PAYWALL VALIDATION ──────────────────────────────────────────
 
-      // Call OpenRouter
+      // ── 5. CALL OPENROUTER ──
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -164,7 +130,6 @@ export default {
         body: JSON.stringify({ ...body, stream: true })
       });
 
-      // Handle OpenRouter errors
       if (!response.ok) {
         const errData = await response.json();
         return new Response(JSON.stringify(errData), {
@@ -173,12 +138,11 @@ export default {
         });
       }
 
-      tokenData.used += 1;
-
-      await env.SUBSCRIPTIONS.put(
-        userToken,
-        JSON.stringify(tokenData)
-      );
+      // ── 6. UPDATE PAID USAGE (Only if paid and successful) ──
+      if (isPaidModel && tokenData) {
+        tokenData.messages_used += 1;
+        await env.SUBSCRIPTIONS.put(request.headers.get("X-Plus-Token"), tokenData);
+      }
 
       // Stream successful response back to client
       return new Response(response.body, {
