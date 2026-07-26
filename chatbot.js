@@ -1,4 +1,4 @@
-// ── ganjoor & helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// ─ ganjoor & helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 let ganjoorCache = null;
 let cacheTime = 0;
@@ -328,7 +328,7 @@ window.activatePlus = function () {
   }
 };
 
-// ── send message ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// ─ send message ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 async function sendMessage() {
   const input = document.getElementById("ferdows-input");
   const question = input.value.trim();
@@ -380,9 +380,19 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
       let errorMessage = `HTTP ${res.status}`;
       try {
         const err = await res.json();
-        // The proxy returns { error: "string" }
-        errorMessage = err.error || err.error?.message || errorMessage;
-      } catch (e) {}
+        //  FIX: Safely extract error message to prevent [object Object]
+        if (typeof err.error === 'string') {
+          errorMessage = err.error;
+        } else if (err.error && typeof err.error.message === 'string') {
+          errorMessage = err.error.message;
+        } else if (typeof err === 'string') {
+          errorMessage = err;
+        } else {
+          errorMessage = JSON.stringify(err);
+        }
+      } catch (e) {
+        errorMessage = "خطا در دریافت جزئیات از سرور";
+      }
 
       // 1. Handle Free Tier Daily Limit (429)
       if (res.status === 429 && currentTier === "free") {
@@ -474,6 +484,14 @@ function addMsg(text, role) {
   div.className = `fm ${role}`;
   const bubble = document.createElement("div");
   bubble.className = "fm-bubble";
+  
+  // 🔥 SAFETY NET: Ensure text is always a string
+  if (typeof text === 'object' && text !== null) {
+    text = JSON.stringify(text, null, 2);
+  } else if (text === undefined || text === null) {
+    text = "پاسخ خالی دریافت شد";
+  }
+  
   bubble.textContent = text;
   div.appendChild(bubble);
   msgs.appendChild(div);
@@ -485,6 +503,12 @@ function addSystemMsg(text) {
   const msgs = document.getElementById("ferdows-messages");
   const div = document.createElement("div");
   div.className = "fm-system";
+  
+  // 🔥 SAFETY NET: Ensure text is always a string
+  if (typeof text === 'object' && text !== null) {
+    text = JSON.stringify(text);
+  }
+  
   div.textContent = text;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
