@@ -1173,3 +1173,129 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   text-decoration: underline;
   transform: translateX(-2px);
 }
+
+
+
+/* ══════════════════════════════════════════
+   FERDOWS OVERLAY (DISABLED STATE)
+   ══════════════════════════════════════════ */
+#ferdows-overlay-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 1;
+  transform: scale(1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#ferdows-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 42, 42, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+#ferdows-overlay-card {
+  position: relative;
+  background: linear-gradient(135deg, #F9F6F0, #EBE4D8);
+  border: 3px solid var(--turquoise);
+  border-radius: 24px;
+  padding: 48px 40px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 32px 80px rgba(0, 150, 136, 0.3);
+  animation: overlayCardPop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes overlayCardPop {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+#ferdows-overlay-close {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 150, 136, 0.1);
+  border: 1px solid var(--turquoise-light);
+  color: var(--turquoise-dark);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+#ferdows-overlay-close:hover {
+  background: rgba(0, 150, 136, 0.2);
+  transform: rotate(90deg);
+}
+
+#ferdows-overlay-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  background: linear-gradient(135deg, var(--turquoise), var(--turquoise-dark));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: white;
+  box-shadow: 0 8px 24px rgba(0, 150, 136, 0.4);
+}
+
+#ferdows-overlay-title {
+  font-family: 'Estedad', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--turquoise-dark);
+  margin: 0 0 8px;
+}
+
+#ferdows-overlay-subtitle {
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin: 0 0 24px;
+}
+
+#ferdows-overlay-divider {
+  width: 60px;
+  height: 3px;
+  margin: 0 auto 24px;
+  background: linear-gradient(90deg, var(--turquoise), var(--gold));
+  border-radius: 2px;
+}
+
+#ferdows-overlay-message {
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 16px;
+  line-height: 2;
+  color: var(--text-main);
+  margin: 0 0 16px;
+  font-weight: 500;
+}
+
+#ferdows-overlay-note {
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 13px;
+  color: var(--turquoise);
+  margin: 0;
+  font-weight: 600;
+}
