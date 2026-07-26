@@ -58,7 +58,6 @@ function initializeMap() {
   });
 }
 
-// 🔥 تابع نمایش پاپ‌آپ دوره
 function showEraPopup(eraIndex) {
   const era = ERAS[eraIndex];
   if (!era || !map) return;
@@ -69,18 +68,17 @@ function showEraPopup(eraIndex) {
     eraPopup = new maplibregl.Popup({
       closeButton: false,
       closeOnClick: false,
-      anchor: 'center',
-      offset: [0, 0],
+      anchor: 'bottom',
+      offset: [0, 120],
       maxWidth: 'none'
     })
-    .setLngLat([58, 32]) // مرکز نقشه
+    .setLngLat([58, 26])
     .setHTML(html)
     .addTo(map);
   } else {
     eraPopup.setHTML(html);
   }
 
-  // مخفی کردن خودکار بعد از ۳ ثانیه
   if (eraPopup._hideTimer) clearTimeout(eraPopup._hideTimer);
   eraPopup._hideTimer = setTimeout(() => {
     if (eraPopup) eraPopup.remove();

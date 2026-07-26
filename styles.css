@@ -1302,13 +1302,14 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   font-weight: 600;
 }
 
-/* ── ERA POPUP (MapLibre) ── */
+/* ── ERA POPUP (MapLibre) - Positioned at Bottom ── */
 .maplibregl-popup-content {
   background: rgba(253, 251, 247, 0.95) !important;
   border: 1px solid var(--turquoise-light) !important;
   border-radius: 24px !important;
-  padding: 8px 24px !important;
-  box-shadow: 0 4px 16px rgba(0, 150, 136, 0.15) !important;
+  padding: 10px 28px !important;
+  box-shadow: 0 4px 20px rgba(0, 150, 136, 0.2) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
   backdrop-filter: blur(8px) !important;
 }
 
