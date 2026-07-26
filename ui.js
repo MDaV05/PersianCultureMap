@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════
-// 🔥 FIX: Remove duplicate declaration - currentEra is already defined in map.js
+let currentEra = 0; // 🔥 این خط حتماً باید اینجا باشد (در map.js تعریف نشده است)
 let panelStack = [];
 
 // ══════════════════════════════════════════
@@ -54,10 +54,8 @@ function renderPanel({ type, data, city, poet }, showBack) {
   const subtitle = document.getElementById("panel-subtitle");
   const body = document.getElementById("panel-body");
 
-  // Scroll to top
   document.getElementById("panel").scrollTop = 0;
 
-  // Animate body
   body.style.opacity = "0";
   body.style.transform = "translateY(8px)";
   setTimeout(() => {
@@ -95,7 +93,7 @@ function renderPanel({ type, data, city, poet }, showBack) {
           </div>
           <div class="poet-arrow">←</div>
         </div>
-      `,
+      `
         )
         .join("") + 
         `<div class="more-info-link">
@@ -123,7 +121,7 @@ function renderPanel({ type, data, city, poet }, showBack) {
           </div>
           <div class="work-desc">${w.desc}</div>
         </div>
-      `,
+      `
         )
         .join("")}
       <div class="more-info-link">
@@ -157,27 +155,21 @@ function updateEra(idx) {
   document.getElementById("era-years").textContent = era.years;
 
   const slider = document.getElementById("timeline-slider");
-  slider.value = idx; // همگام‌سازی اسلایدر
+  slider.value = idx;
   const pct = (idx / (ERAS.length - 1)) * 100;
   slider.style.setProperty("--pct", pct + "%");
 
   // 🔥 FIX: مدیریت هوشمند و مطمئن نمایش Era Badge
   const badge = document.getElementById("era-badge");
   if (badge) {
-    // 1. آپدیت متن
     badge.textContent = `${era.name} · ${era.nameEn}`;
+    void badge.offsetWidth; // فورس کردن Reflow برای اجرای صحیح انیمیشن در Brave/Safari
     
-    // 2. فورس کردن Reflow برای اطمینان از اجرای انیمیشن در همه مرورگرها (مخصوصاً Brave)
-    void badge.offsetWidth; 
-    
-    // 3. نمایش المان
     badge.style.opacity = "1";
     badge.style.transform = "translateX(-50%) translateY(0)";
     
-    // 4. پاک کردن تایمر قبلی برای جلوگیری از تداخل
     if (badge._hideTimer) clearTimeout(badge._hideTimer);
     
-    // 5. مخفی کردن خودکار بعد از 3 ثانیه
     badge._hideTimer = setTimeout(() => {
       badge.style.opacity = "0";
       badge.style.transform = "translateX(-50%) translateY(20px)";
@@ -190,28 +182,23 @@ function updateEra(idx) {
 window.openPoet = openPoet;
 window.openWork = openWork;
 
-// Listen for the map telling the UI to open a city
 document.addEventListener('openCityPanel', (e) => {
   const city = e.detail;
   const panel = document.getElementById("panel");
   const panelHeader = document.getElementById("panel-header");
   if (panel && panelHeader) {
-    // 1. Find the image element, or create it if it doesn't exist yet
     let headerImg = document.getElementById("panel-header-img");
     if (!headerImg) {
       headerImg = document.createElement("img");
       headerImg.id = "panel-header-img";
-      
-      // Insert it right before the panel-header
       panel.insertBefore(headerImg, panelHeader);
     }
 
-    // 2. Set the image source and show it
     if (city.headerImage) {
       headerImg.src = city.headerImage;
       headerImg.style.display = "block";
     } else {
-      headerImg.style.display = "none"; // Hide it if the city has no image
+      headerImg.style.display = "none";
     }
   }
   openCity(e.detail);
@@ -236,7 +223,6 @@ function setupUI() {
   updateEra(0);
 }
 
-// Initialize UI when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
   setupUI();
   handleDeepLink();
@@ -244,37 +230,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function handleDeepLink() {
   const params = new URLSearchParams(window.location.search);
-
   const poetId = params.get("poet");
 
-  if (!poetId) {
-    return;
-  }
+  if (!poetId) return;
 
   console.log("Deep link detected:", poetId);
 
   for (const city of CITIES) {
-    const poet = city.poets.find(
-      p => p.id === poetId
-    );
-
-    if (!poet) {
-      continue;
-    }
+    const poet = city.poets.find(p => p.id === poetId);
+    if (!poet) continue;
 
     if (window.mapReady) {
       navigateToPoet(city, poet);
     } else {
-      document.addEventListener(
-        "mapReady",
-        () => navigateToPoet(city, poet),
-        { once: true }
-      );
+      document.addEventListener("mapReady", () => navigateToPoet(city, poet), { once: true });
     }
-
     return;
   }
-
   console.warn(`Poet "${poetId}" not found.`);
 }
 
@@ -291,18 +263,15 @@ function navigateToPoet(city, poet) {
     });
   }
 
-  // Highlight the city's marker
   markers.forEach(marker => {
     if (marker.cityData.id === city.id) {
       marker.getElement().classList.add("deep-link-highlight");
-
       setTimeout(() => {
         marker.getElement().classList.remove("deep-link-highlight");
       }, 3000);
     }
   });
 
-  // Open city panel after the fly animation
   setTimeout(() => {
     openCity(city);
   }, 1200);

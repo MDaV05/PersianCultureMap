@@ -1304,10 +1304,10 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
 
 #era-badge {
   position: fixed;
-  bottom: 100px; /* 🔥 تغییر از top به bottom برای قرارگیری در پایین صفحه */
+  bottom: 100px;
   left: 50%;
-  transform: translateX(-50%) translateY(20px); /* شروع با کمی فاصله برای انیمیشن */
-  z-index: 10000; /* 🔥 اولویت نمایش بسیار بالا برای موبایل */
+  transform: translateX(-50%) translateY(20px);
+  z-index: 10000;
   background: rgba(253, 251, 247, 0.95);
   border: 1px solid var(--turquoise-light);
   border-radius: 24px;
@@ -1316,23 +1316,21 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   font-weight: 600;
   color: var(--turquoise-dark);
   pointer-events: none;
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 150, 136, 0.2);
   transition: opacity 0.4s ease, transform 0.4s ease;
   white-space: nowrap;
   direction: rtl;
   font-family: var(--font-fa);
-  
-  /* 🔥 جلوگیری از بیرون زدن از صفحه در گوشی‌های کوچک */
   max-width: 90vw;
   text-align: center;
-  opacity: 0; /* در حالت پیش‌فرض مخفی است تا JS آن را نمایش دهد */
+  opacity: 0;
 }
 
-/* تنظیمات اختصاصی موبایل */
 @media (max-width: 768px) {
   #era-badge {
-    bottom: 90px; /* کمی بالاتر برای جلوگیری از تداخل با نوار ابزار مرورگر موبایل */
+    bottom: 90px;
     padding: 8px 16px;
     font-size: 13px;
   }
