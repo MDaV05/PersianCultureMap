@@ -1148,3 +1148,28 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
 /* ************************************************************************************************************************************************
                                                                       dark mode
 ************************************************************************************************************************************************ */
+
+
+
+/* ── MORE INFO LINK ── */
+.more-info-link {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--cream-dark);
+}
+
+.more-info-link a {
+  color: var(--turquoise-dark);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: inline-block;
+}
+
+.more-info-link a:hover {
+  color: var(--turquoise);
+  text-decoration: underline;
+  transform: translateX(2px);
+}

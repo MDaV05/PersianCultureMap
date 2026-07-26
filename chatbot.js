@@ -363,16 +363,29 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
     };
     if (currentTier === "plus") body.reasoning = { effort: "none" };
 
-    const res = await fetch("https://persianculturemap.modavari005.workers.dev/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "HTTP-Referer": window.location.href,
-        "X-Title": "Ferdows - Persian Poetry Map",
-        "X-Plus-Token": currentTier === "plus" ? (localStorage.getItem("ferdows_plus_token") || "") : ""
-      },
-      body: JSON.stringify(body)
-    });
+   const res = await fetch("https://persianculturemap.modavari005.workers.dev/", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "HTTP-Referer": window.location.href,
+    "X-Title": "Ferdows - Persian Poetry Map",
+    "X-Plus-Token": currentTier === "plus" ? (localStorage.getItem("ferdows_plus_token") || "") : ""
+  },
+  body: JSON.stringify(body)
+});
+
+console.log("Response status:", res.status);
+console.log("Response headers:", [...res.headers.entries()]);
+
+const rawText = await res.text();
+console.log("Raw response:", rawText);
+
+let err;
+try {
+  err = JSON.parse(rawText);
+} catch {
+  err = { error: rawText || `HTTP ${res.status}` };
+}
 
     // ── ERROR HANDLING ──
     if (!res.ok) {

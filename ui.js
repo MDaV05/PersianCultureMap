@@ -1,7 +1,7 @@
-// ═════════════════════════════════════════
+// ══════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════
-let currentEra = 0;
+// 🔥 FIX: Remove duplicate declaration - currentEra is already defined in map.js
 let panelStack = [];
 
 // ══════════════════════════════════════════
