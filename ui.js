@@ -157,18 +157,32 @@ function updateEra(idx) {
   document.getElementById("era-years").textContent = era.years;
 
   const slider = document.getElementById("timeline-slider");
-  slider.value = idx;
+  slider.value = idx; // همگام‌سازی اسلایدر
   const pct = (idx / (ERAS.length - 1)) * 100;
   slider.style.setProperty("--pct", pct + "%");
 
-  // 🔥 FIX: Make era badge visible on mobile by adding a small delay
-  setTimeout(() => {
-    const eraBadge = document.getElementById("era-badge");
-    if (eraBadge) {
-      eraBadge.style.opacity = "1";
-      eraBadge.style.transform = "translateX(-50%) translateY(0)";
-    }
-  }, 100);
+  // 🔥 FIX: مدیریت هوشمند و مطمئن نمایش Era Badge
+  const badge = document.getElementById("era-badge");
+  if (badge) {
+    // 1. آپدیت متن
+    badge.textContent = `${era.name} · ${era.nameEn}`;
+    
+    // 2. فورس کردن Reflow برای اطمینان از اجرای انیمیشن در همه مرورگرها (مخصوصاً Brave)
+    void badge.offsetWidth; 
+    
+    // 3. نمایش المان
+    badge.style.opacity = "1";
+    badge.style.transform = "translateX(-50%) translateY(0)";
+    
+    // 4. پاک کردن تایمر قبلی برای جلوگیری از تداخل
+    if (badge._hideTimer) clearTimeout(badge._hideTimer);
+    
+    // 5. مخفی کردن خودکار بعد از 3 ثانیه
+    badge._hideTimer = setTimeout(() => {
+      badge.style.opacity = "0";
+      badge.style.transform = "translateX(-50%) translateY(20px)";
+    }, 3000);
+  }
 
   document.dispatchEvent(new CustomEvent('eraChanged', { detail: idx }));
 }
