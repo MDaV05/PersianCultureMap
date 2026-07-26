@@ -60,29 +60,24 @@ function initializeMap() {
 
 function showEraPopup(eraIndex) {
   const era = ERAS[eraIndex];
-  if (!era || !map) return;
+  if (!era) return;
 
-  const html = `<div class="era-popup-content">${era.name} · ${era.nameEn}</div>`;
+  const existingPopup = document.getElementById('era-popup-html');
+  if (existingPopup) existingPopup.remove();
 
-  if (!eraPopup) {
-    eraPopup = new maplibregl.Popup({
-      closeButton: false,
-      closeOnClick: false,
-      anchor: 'bottom',
-      offset: [0, 120],
-      maxWidth: 'none'
-    })
-    .setLngLat([58, 26])
-    .setHTML(html)
-    .addTo(map);
-  } else {
-    eraPopup.setHTML(html);
-  }
+  const popup = document.createElement('div');
+  popup.id = 'era-popup-html';
+  popup.className = 'era-popup-html';
+  popup.innerHTML = `${era.name} · ${era.nameEn}`;
+  
+  document.body.appendChild(popup);
 
-  if (eraPopup._hideTimer) clearTimeout(eraPopup._hideTimer);
-  eraPopup._hideTimer = setTimeout(() => {
-    if (eraPopup) eraPopup.remove();
-    eraPopup = null;
+  setTimeout(() => {
+    if (popup.parentNode) {
+      popup.style.opacity = '0';
+      popup.style.transform = 'translateY(20px)';
+      setTimeout(() => popup.remove(), 300);
+    }
   }, 3000);
 }
 

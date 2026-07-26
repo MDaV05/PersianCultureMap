@@ -1302,26 +1302,35 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   font-weight: 600;
 }
 
-/* ── ERA POPUP (MapLibre) - Positioned at Bottom ── */
-.maplibregl-popup-content {
-  background: rgba(253, 251, 247, 0.95) !important;
-  border: 1px solid var(--turquoise-light) !important;
-  border-radius: 24px !important;
-  padding: 10px 28px !important;
-  box-shadow: 0 4px 20px rgba(0, 150, 136, 0.2) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  backdrop-filter: blur(8px) !important;
-}
-
-.maplibregl-popup-tip {
-  display: none !important; /* حذف فلش پاپ‌آپ */
-}
-
-.era-popup-content {
+/* ── ERA POPUP HTML (Fixed Position) ── */
+.era-popup-html {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  z-index: 1000;
+  background: rgba(253, 251, 247, 0.95);
+  border: 1px solid var(--turquoise-light);
+  border-radius: 24px;
+  padding: 12px 28px;
   font-family: var(--font-fa);
   font-size: 14px;
   font-weight: 600;
   color: var(--turquoise-dark);
   white-space: nowrap;
   direction: rtl;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 150, 136, 0.2);
+  opacity: 1;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+/* موبایل */
+@media (max-width: 768px) {
+  .era-popup-html {
+    bottom: 80px;
+    padding: 10px 20px;
+    font-size: 13px;
+  }
 }
