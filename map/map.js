@@ -1,12 +1,11 @@
 // ══════════════════════════════════════════
 // MAP — Phase 5: Bulletproof CartoDB + Fixed Paths
 // ══════════════════════════════════════════
-
 let map;
 let markers = [];
 let citiesLoaded = false;
-
-const STARTING_ERA = 0; 
+let eraPopup = null; // 🔥 Popup برای نمایش دوره
+const STARTING_ERA = 0;
 
 function initializeMap() {
   map = new maplibregl.Map({
@@ -14,8 +13,6 @@ function initializeMap() {
     style: {
       version: 8,
       sources: {
-        // 🌟 CARTODB POSITRON (No Labels)
-        // Free, no API key, no blocking, works perfectly in Iran.
         "carto-light": {
           type: "raster",
           tiles: [
@@ -31,54 +28,73 @@ function initializeMap() {
         {
           id: "background",
           type: "background",
-          paint: { "background-color": "#f7f2e6" } // Cream background
+          paint: { "background-color": "#f7f2e6" }
         },
         {
           id: "basemap",
           type: "raster",
           source: "carto-light",
           paint: {
-            "raster-opacity": 0.65, // Let the cream background show through slightly
-            "raster-saturation": -0.8 // Remove any lingering modern map colors
+            "raster-opacity": 0.65,
+            "raster-saturation": -0.8
           }
         }
       ]
     },
-    center: [58, 32], // Centered perfectly on the Greater Persian Realm
+    center: [58, 32],
     zoom: 4,
     minZoom: 3,
     maxZoom: 10,
   });
-  window.map = map;
-  //map.addControl(new maplibregl.NavigationControl(), "bottom-left");──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
   map.on("load", async () => {
     console.log("✓ MapLibre loaded with CartoDB basemap");
-    
-    // 🔥 FIX: Use the STARTING_ERA variable instead of hardcoded 0
     await loadBorders(STARTING_ERA);
     loadCities();
     updateMarkers(STARTING_ERA);
-    window.mapReady = true;
-
-    document.dispatchEvent(
-          new CustomEvent("mapReady")
-      );
+    
+    // نمایش پاپ‌آپ دوره اولیه
+    showEraPopup(STARTING_ERA);
   });
 }
 
+// 🔥 تابع نمایش پاپ‌آپ دوره
+function showEraPopup(eraIndex) {
+  const era = ERAS[eraIndex];
+  if (!era || !map) return;
 
+  const html = `<div class="era-popup-content">${era.name} · ${era.nameEn}</div>`;
+
+  if (!eraPopup) {
+    eraPopup = new maplibregl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+      anchor: 'center',
+      offset: [0, 0],
+      maxWidth: 'none'
+    })
+    .setLngLat([58, 32]) // مرکز نقشه
+    .setHTML(html)
+    .addTo(map);
+  } else {
+    eraPopup.setHTML(html);
+  }
+
+  // مخفی کردن خودکار بعد از ۳ ثانیه
+  if (eraPopup._hideTimer) clearTimeout(eraPopup._hideTimer);
+  eraPopup._hideTimer = setTimeout(() => {
+    if (eraPopup) eraPopup.remove();
+    eraPopup = null;
+  }, 3000);
+}
 
 // ══════════════════════════════════════════
 // BORDERS (Bulletproof Fetch)
 // ══════════════════════════════════════════
 async function loadBorders(eraIndex) {
-  // 🔥 FIX: Construct the path carefully. 
-  // Ensure this matches where your files actually live in your project folder.
-  const filePath = `map/borders/era_${eraIndex}.geojson`; 
-  
+  const filePath = `map/borders/era_${eraIndex}.geojson`;
   try {
-    console.log(`📂 Attempting to load borders from: ${filePath}`);
+    console.log(` Attempting to load borders from: ${filePath}`);
     const res = await fetch(filePath);
     
     if (!res.ok) {
@@ -87,17 +103,14 @@ async function loadBorders(eraIndex) {
     
     const geojson = await res.json();
 
-    // Update source if it already exists (for smooth era transitions)
     if (map.getSource("empire")) {
       map.getSource("empire").setData(geojson);
       console.log(`✓ Updated borders for era ${eraIndex}`);
       return;
     }
 
-    // Add source and layers if it's the first time loading
     map.addSource("empire", { type: "geojson", data: geojson });
 
-    // 1. Turquoise Fill
     map.addLayer({
       id: "empire-fill",
       type: "fill",
@@ -105,7 +118,6 @@ async function loadBorders(eraIndex) {
       paint: { "fill-color": "#0f8b8d", "fill-opacity": 0.1 }
     });
 
-    // 2. Turquoise Outer Border (Dashed)
     map.addLayer({
       id: "empire-border-outer",
       type: "line",
@@ -118,7 +130,6 @@ async function loadBorders(eraIndex) {
       }
     });
 
-    // 3. Gold Inner Border (Double-line effect)
     map.addLayer({
       id: "empire-border-inner",
       type: "line",
@@ -134,7 +145,6 @@ async function loadBorders(eraIndex) {
     console.log(`✓ Successfully loaded borders for era ${eraIndex}`);
   } catch (err) {
     console.warn(`❌ Failed to load borders for era ${eraIndex}:`, err.message);
-    console.warn(`💡 Check if the file exists at exactly this path: ${filePath}`);
   }
 }
 
@@ -193,12 +203,10 @@ function updateMarkers(eraIndex) {
 // ERA CHANGES
 // ══════════════════════════════════════════
 document.addEventListener("eraChanged", async (e) => {
-  // 🔥 FIX: If your slider sends 0,1,2... but files are era_1, era_2...
-  // You might need to add 1 here: const fileEra = e.detail + 1;
-  const fileEra = e.detail; // Change this math if your slider and files don't match!
-  
+  const fileEra = e.detail;
   await loadBorders(fileEra);
   updateMarkers(e.detail);
+  showEraPopup(e.detail); // 🔥 نمایش پاپ‌آپ دوره جدید
 });
 
 document.addEventListener("DOMContentLoaded", initializeMap);

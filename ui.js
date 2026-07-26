@@ -155,18 +155,16 @@ function updateEra(idx) {
 
   document.getElementById("era-name").textContent = era.name;
   document.getElementById("era-years").textContent = era.years;
-  document.getElementById("era-badge").textContent = `${era.name} · ${era.nameEn}`;
+  // 🔥 حذف خط era-badge چون الان از Popup استفاده می‌کنیم
 
   const slider = document.getElementById("timeline-slider");
   slider.value = idx;
   const pct = (idx / (ERAS.length - 1)) * 100;
   slider.style.setProperty("--pct", pct + "%");
 
-  // THE EXPERT WAY: Broadcast that the era changed, instead of calling a missing function
   document.dispatchEvent(new CustomEvent('eraChanged', { detail: idx }));
 }
 
-// Ensure these are globally available since they are called by inline HTML clicks in your panel
 window.openPoet = openPoet;
 window.openWork = openWork;
 
@@ -206,33 +204,16 @@ function setupTimeline() {
 
   slider.addEventListener("input", (e) => {
     updateEra(parseInt(e.target.value));
-
-    // Show era badge temporarily
-    const badge = document.getElementById("era-badge");
-    badge.style.opacity = "1";
-    clearTimeout(badge._hideTimer);
-    badge._hideTimer = setTimeout(() => {
-      badge.style.opacity = "0";
-    }, 2000);
+    // 🔥 حذف کدهای مربوط به era-badge
   });
 }
 
 function setupUI() {
-  // Setup close button
   document.getElementById("panel-close").addEventListener("click", closePanel);
   document.getElementById("panel-back").addEventListener("click", goBack);
-
-  // Setup timeline
   setupTimeline();
-
-  // Initialize first era
   updateEra(0);
-
-  // Hide era badge after 3s
-  const badge = document.getElementById("era-badge");
-  badge._hideTimer = setTimeout(() => {
-    badge.style.opacity = "0";
-  }, 3000);
+  // 🔥 حذف کدهای مربوط به era-badge
 }
 
 // Initialize UI when DOM is ready

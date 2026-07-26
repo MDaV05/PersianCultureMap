@@ -616,6 +616,8 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
 }
 
 /* ── FLOATING UI ELEMENTS ── */
+/*
+
 #era-badge {
   position: fixed;
   top: 900px;
@@ -635,7 +637,7 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   transition: opacity 0.5s, transform 0.5s;
   white-space: nowrap;
 }
-
+*/
 #legend {
   position: fixed;
   bottom: 24px;
@@ -1298,4 +1300,27 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   color: var(--turquoise);
   margin: 0;
   font-weight: 600;
+}
+
+/* ── ERA POPUP (MapLibre) ── */
+.maplibregl-popup-content {
+  background: rgba(253, 251, 247, 0.95) !important;
+  border: 1px solid var(--turquoise-light) !important;
+  border-radius: 24px !important;
+  padding: 8px 24px !important;
+  box-shadow: 0 4px 16px rgba(0, 150, 136, 0.15) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.maplibregl-popup-tip {
+  display: none !important; /* حذف فلش پاپ‌آپ */
+}
+
+.era-popup-content {
+  font-family: var(--font-fa);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--turquoise-dark);
+  white-space: nowrap;
+  direction: rtl;
 }
