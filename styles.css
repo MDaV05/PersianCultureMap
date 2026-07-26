@@ -615,29 +615,6 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   letter-spacing: 8px;
 }
 
-/* ── FLOATING UI ELEMENTS ── */
-/*
-
-#era-badge {
-  position: fixed;
-  top: 900px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 200;
-  background: rgba(253, 251, 247, 0.9);
-  border: 1px solid var(--turquoise-light);
-  border-radius: 24px;
-  padding: 8px 24px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--turquoise-dark);
-  pointer-events: none;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 16px rgba(0, 150, 136, 0.15);
-  transition: opacity 0.5s, transform 0.5s;
-  white-space: nowrap;
-}
-*/
 #legend {
   position: fixed;
   bottom: 24px;
