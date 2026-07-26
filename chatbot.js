@@ -38,7 +38,7 @@ function filterPoets(poets, question) {
 
 const MODELS = {
   free: {
-    id: "openai/gpt-oss-120b:free",
+    id: "google/gemma-4-31b-it:free",
     name: "فردوس",
     nameEn: "Ferdows",
     badge: "رایگان",
