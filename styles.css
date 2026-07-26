@@ -1151,7 +1151,7 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
 
 
 
-/* ── MORE INFO LINK ── */
+/* ── MORE INFO LINK ─ */
 .more-info-link {
   text-align: center;
   margin-top: 24px;
@@ -1171,5 +1171,5 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
 .more-info-link a:hover {
   color: var(--turquoise);
   text-decoration: underline;
-  transform: translateX(2px);
+  transform: translateX(-2px);
 }

@@ -78,7 +78,10 @@ function renderPanel({ type, data, city, poet }, showBack) {
       body.innerHTML = `
         <p style="text-align:center; color:var(--text-dim); padding:40px 20px; font-size:15px; line-height:1.8;">
           شاعری برای «${era.name}» در این شهر ثبت نشده است.
-        </p>`;
+        </p>
+        <div class="more-info-link">
+          <a href="https://docs.chekameh.xyz/" target="_blank">اطلاعات بیشتر ←</a>
+        </div>`;
     } else {
       body.innerHTML = poets
         .map(
@@ -94,7 +97,10 @@ function renderPanel({ type, data, city, poet }, showBack) {
         </div>
       `,
         )
-        .join("");
+        .join("") + 
+        `<div class="more-info-link">
+          <a href="https://docs.chekameh.xyz/" target="_blank">اطلاعات بیشتر ←</a>
+        </div>`;
     }
   } else if (type === "poet") {
     eyebrow.textContent = "شاعر · POET";
@@ -120,7 +126,9 @@ function renderPanel({ type, data, city, poet }, showBack) {
       `,
         )
         .join("")}
-    `;
+      <div class="more-info-link">
+        <a href="https://docs.chekameh.xyz/" target="_blank">اطلاعات بیشتر ←</a>
+      </div>`;
   } else if (type === "work") {
     eyebrow.textContent = "اثر · WORK";
     title.textContent = data.name;
@@ -132,7 +140,9 @@ function renderPanel({ type, data, city, poet }, showBack) {
         <div class="poem-divider">— ✦ —</div>
         ${data.lines.map((l) => `<div class="poem-line">${l}</div>`).join("")}
       </div>
-    `;
+      <div class="more-info-link">
+        <a href="https://docs.chekameh.xyz/" target="_blank">اطلاعات بیشتر ←</a>
+      </div>`;
   }
 }
 

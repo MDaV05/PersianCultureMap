@@ -1,4 +1,4 @@
-// ─ ganjoor & helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// ── ganjoor & helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 let ganjoorCache = null;
 let cacheTime = 0;
@@ -87,7 +87,7 @@ function buildChatbot() {
       <div id="ferdows-messages">
         <div class="fm bot">
           <div class="fm-bubble">
-            سلام! من <strong>فردوس</strong> هستم 🌹<br>
+            سلام! من <strong>فردوس</strong> هستم <br>
             دستیار هوش مصنوعی شعر پارسی.<br><br>
             <span style="opacity:0.5;font-size:11px;" dir="ltr">Ask me anything about Persian poetry!</span>
           </div>
@@ -173,12 +173,12 @@ function switchTier(tier) {
 
   addSystemMsg(
     tier === "plus"
-      ? "◈ فردوس پلاس فعال شد"
+      ? " فردوس پلاس فعال شد"
       : "✦ فردوس فعال شد"
   );
 }
 
-// ── Activation Modal ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// ── Activation Modal ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 function showActivationModal(message = "") {
   document.getElementById('ferdows-activation-modal')?.remove(); 
 
@@ -214,7 +214,7 @@ function showActivationModal(message = "") {
           margin: 0 auto 24px;
           font-size: 40px;
           box-shadow: 0 8px 24px rgba(0, 150, 136, 0.4);
-        ">🔒</div>
+        "></div>
         
         <h3 style="
           font-family: 'Lalezar', cursive;
@@ -328,7 +328,7 @@ window.activatePlus = function () {
   }
 };
 
-// ─ send message ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// ── send message ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 async function sendMessage() {
   const input = document.getElementById("ferdows-input");
   const question = input.value.trim();
@@ -363,29 +363,16 @@ ${currentTier === "plus" ? "- تحلیل عمیق ادبی و تاریخی ار�
     };
     if (currentTier === "plus") body.reasoning = { effort: "none" };
 
-   const res = await fetch("https://persianculturemap.modavari005.workers.dev/", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "HTTP-Referer": window.location.href,
-    "X-Title": "Ferdows - Persian Poetry Map",
-    "X-Plus-Token": currentTier === "plus" ? (localStorage.getItem("ferdows_plus_token") || "") : ""
-  },
-  body: JSON.stringify(body)
-});
-
-console.log("Response status:", res.status);
-console.log("Response headers:", [...res.headers.entries()]);
-
-const rawText = await res.text();
-console.log("Raw response:", rawText);
-
-let err;
-try {
-  err = JSON.parse(rawText);
-} catch {
-  err = { error: rawText || `HTTP ${res.status}` };
-}
+    const res = await fetch("https://persianculturemap.modavari005.workers.dev/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "HTTP-Referer": window.location.href,
+        "X-Title": "Ferdows - Persian Poetry Map",
+        "X-Plus-Token": currentTier === "plus" ? (localStorage.getItem("ferdows_plus_token") || "") : ""
+      },
+      body: JSON.stringify(body)
+    });
 
     // ── ERROR HANDLING ──
     if (!res.ok) {
@@ -410,7 +397,7 @@ try {
       // 1. Handle Free Tier Daily Limit (429)
       if (res.status === 429 && currentTier === "free") {
         addSystemMsg(`⚠️ ${errorMessage}`);
-        return; // Exit gracefully, the finally block will re-enable the input
+        return;
       }
 
       // 2. Handle Invalid/Expired Paid Token (403)
@@ -480,7 +467,6 @@ try {
 
   } catch (err) {
     removeTyping(typingId);
-    // Only show error if it's a complete network failure (fetch failed before getting a response)
     addMsg(`خطا: اتصال برقرار نشد. لطفاً اینترنت خود را بررسی کنید.`, "bot");
     console.error(err);
   } finally {
