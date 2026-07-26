@@ -159,25 +159,15 @@ function updateEra(idx) {
   const pct = (idx / (ERAS.length - 1)) * 100;
   slider.style.setProperty("--pct", pct + "%");
 
-  // 🔥 FIX: مدیریت هوشمند و مطمئن نمایش Era Badge
+  // 🔥 FIX: Manage era badge text safely
   const badge = document.getElementById("era-badge");
   if (badge) {
     badge.textContent = `${era.name} · ${era.nameEn}`;
-    void badge.offsetWidth; // فورس کردن Reflow برای اجرای صحیح انیمیشن در Brave/Safari
-    
-    badge.style.opacity = "1";
-    badge.style.transform = "translateX(-50%) translateY(0)";
-    
-    if (badge._hideTimer) clearTimeout(badge._hideTimer);
-    
-    badge._hideTimer = setTimeout(() => {
-      badge.style.opacity = "0";
-      badge.style.transform = "translateX(-50%) translateY(20px)";
-    }, 3000);
   }
 
   document.dispatchEvent(new CustomEvent('eraChanged', { detail: idx }));
 }
+
 
 window.openPoet = openPoet;
 window.openWork = openWork;
@@ -213,21 +203,42 @@ function setupTimeline() {
 
   slider.addEventListener("input", (e) => {
     updateEra(parseInt(e.target.value));
+    
+    // Show era badge temporarily
+    const badge = document.getElementById("era-badge");
+    if (badge) {
+      // 🔥 Force reflow to ensure animation triggers on mobile browsers
+      void badge.offsetWidth; 
+      badge.style.opacity = "1";
+      badge.style.transform = "translateX(-50%) translateY(0)";
+      
+      clearTimeout(badge._hideTimer);
+      badge._hideTimer = setTimeout(() => {
+        badge.style.opacity = "0";
+        badge.style.transform = "translateX(-50%) translateY(20px)";
+      }, 2500);
+    }
   });
-}
 
 function setupUI() {
   document.getElementById("panel-close").addEventListener("click", closePanel);
   document.getElementById("panel-back").addEventListener("click", goBack);
   setupTimeline();
   updateEra(0);
+  
+  // Show era badge on initial load
+  const badge = document.getElementById("era-badge");
+  if (badge) {
+    void badge.offsetWidth;
+    badge.style.opacity = "1";
+    badge.style.transform = "translateX(-50%) translateY(0)";
+    
+    badge._hideTimer = setTimeout(() => {
+      badge.style.opacity = "0";
+      badge.style.transform = "translateX(-50%) translateY(20px)";
+    }, 3000);
+  }
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  setupUI();
-  handleDeepLink();
-});
-
 function handleDeepLink() {
   const params = new URLSearchParams(window.location.search);
   const poetId = params.get("poet");

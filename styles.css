@@ -1279,12 +1279,13 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   font-weight: 600;
 }
 
+/* ── FLOATING UI ELEMENTS ── */
 #era-badge {
   position: fixed;
-  bottom: 100px;
+  bottom: 100px; /* 🔥 CHANGED FROM top: 900px */
   left: 50%;
   transform: translateX(-50%) translateY(20px);
-  z-index: 10000;
+  z-index: 10000; /* 🔥 Increased to ensure it's above everything */
   background: rgba(253, 251, 247, 0.95);
   border: 1px solid var(--turquoise-light);
   border-radius: 24px;
@@ -1293,18 +1294,19 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   font-weight: 600;
   color: var(--turquoise-dark);
   pointer-events: none;
-  -webkit-backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px); /* 🔥 CRUCIAL for Brave/Safari mobile */
   backdrop-filter: blur(8px);
-  box-shadow: 0 4px 20px rgba(0, 150, 136, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 150, 136, 0.15);
   transition: opacity 0.4s ease, transform 0.4s ease;
   white-space: nowrap;
   direction: rtl;
   font-family: var(--font-fa);
-  max-width: 90vw;
+  max-width: 90vw; /* 🔥 Prevents horizontal overflow on small screens */
   text-align: center;
-  opacity: 0;
+  opacity: 0; /* Start hidden, JS will show it */
 }
 
+/* Mobile adjustments */
 @media (max-width: 768px) {
   #era-badge {
     bottom: 90px;
