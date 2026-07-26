@@ -1302,35 +1302,37 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   font-weight: 600;
 }
 
-/* ── ERA POPUP HTML (Fixed Position) ── */
-.era-popup-html {
+#era-badge {
   position: fixed;
-  bottom: 100px;
+  bottom: 100px;  /* 🔥 تغییر از top به bottom */
   left: 50%;
-  transform: translateX(-50%) translateY(0);
-  z-index: 1000;
+  transform: translateX(-50%);
+  z-index: 1000;  /* 🔥 افزایش z-index */
   background: rgba(253, 251, 247, 0.95);
   border: 1px solid var(--turquoise-light);
   border-radius: 24px;
-  padding: 12px 28px;
-  font-family: var(--font-fa);
+  padding: 10px 24px;
   font-size: 14px;
   font-weight: 600;
   color: var(--turquoise-dark);
-  white-space: nowrap;
-  direction: rtl;
+  pointer-events: none;
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 150, 136, 0.2);
-  opacity: 1;
-  transition: all 0.3s ease;
-  pointer-events: none;
+  transition: opacity 0.5s, transform 0.5s;
+  white-space: nowrap;
+  direction: rtl;
+  font-family: var(--font-fa);
+  /* 🔥 اطمینان از نمایش در موبایل */
+  max-width: 90%;
+  text-align: center;
 }
 
-/* موبایل */
+/* 🔥 ریسپانسیو برای موبایل */
 @media (max-width: 768px) {
-  .era-popup-html {
+  #era-badge {
     bottom: 80px;
-    padding: 10px 20px;
+    padding: 8px 16px;
     font-size: 13px;
+    z-index: 10000; /* 🔥 z-index بالاتر برای موبایل */
   }
 }

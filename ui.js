@@ -155,12 +155,20 @@ function updateEra(idx) {
 
   document.getElementById("era-name").textContent = era.name;
   document.getElementById("era-years").textContent = era.years;
-  // 🔥 حذف خط era-badge چون الان از Popup استفاده می‌کنیم
 
   const slider = document.getElementById("timeline-slider");
   slider.value = idx;
   const pct = (idx / (ERAS.length - 1)) * 100;
   slider.style.setProperty("--pct", pct + "%");
+
+  // 🔥 FIX: Make era badge visible on mobile by adding a small delay
+  setTimeout(() => {
+    const eraBadge = document.getElementById("era-badge");
+    if (eraBadge) {
+      eraBadge.style.opacity = "1";
+      eraBadge.style.transform = "translateX(-50%) translateY(0)";
+    }
+  }, 100);
 
   document.dispatchEvent(new CustomEvent('eraChanged', { detail: idx }));
 }
@@ -170,10 +178,10 @@ window.openWork = openWork;
 
 // Listen for the map telling the UI to open a city
 document.addEventListener('openCityPanel', (e) => {
-    const city = e.detail;
+  const city = e.detail;
   const panel = document.getElementById("panel");
   const panelHeader = document.getElementById("panel-header");
-    if (panel && panelHeader) {
+  if (panel && panelHeader) {
     // 1. Find the image element, or create it if it doesn't exist yet
     let headerImg = document.getElementById("panel-header-img");
     if (!headerImg) {
@@ -204,7 +212,6 @@ function setupTimeline() {
 
   slider.addEventListener("input", (e) => {
     updateEra(parseInt(e.target.value));
-    // 🔥 حذف کدهای مربوط به era-badge
   });
 }
 
@@ -213,7 +220,6 @@ function setupUI() {
   document.getElementById("panel-back").addEventListener("click", goBack);
   setupTimeline();
   updateEra(0);
-  // 🔥 حذف کدهای مربوط به era-badge
 }
 
 // Initialize UI when DOM is ready
@@ -286,4 +292,4 @@ function navigateToPoet(city, poet) {
   setTimeout(() => {
     openCity(city);
   }, 1200);
-} 
+}
