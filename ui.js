@@ -212,15 +212,58 @@ function setupTimeline() {
   slider.setAttribute("step", "1");
 
   slider.addEventListener("input", (e) => {
-    updateEra(parseInt(e.target.value));
-  });
-}
+  updateEra(parseInt(e.target.value));
+  
+  // Show era badge temporarily
+  const badge = document.getElementById("era-badge");
+  if (badge) {
+    // Ensure the element is visible for browsers (Brave iOS/Android sometimes ignores opacity changes if element was not rendered)
+    badge.style.display = 'block';
+    badge.style.visibility = 'visible';
+
+    // Force reflow to ensure animation triggers on mobile browsers
+    void badge.offsetWidth; 
+
+    // Use rAF to ensure style changes are applied in a way mobile browsers respect
+    requestAnimationFrame(() => {
+      badge.style.opacity = "1";
+      badge.style.transform = "translateX(-50%) translateY(0)";
+    });
+    
+    clearTimeout(badge._hideTimer);
+    badge._hideTimer = setTimeout(() => {
+      badge.style.opacity = "0";
+      badge.style.transform = "translateX(-50%) translateY(20px)";
+      // After transition, hide the element to avoid accidental layering issues on some browsers
+      setTimeout(() => { try { badge.style.display = 'none'; } catch(e){} }, 450);
+    }, 2500);
+  }
+});
 
 function setupUI() {
   document.getElementById("panel-close").addEventListener("click", closePanel);
   document.getElementById("panel-back").addEventListener("click", goBack);
   setupTimeline();
   updateEra(0);
+  // inside setupUI() — initial-load badge reveal
+  const badge = document.getElementById("era-badge");
+  if (badge) {
+  // Make sure it's displayed so mobile browsers will animate it
+  badge.style.display = 'block';
+  badge.style.visibility = 'visible';
+
+  void badge.offsetWidth;
+  requestAnimationFrame(() => {
+    badge.style.opacity = "1";
+    badge.style.transform = "translateX(-50%) translateY(0)";
+  });
+  
+  badge._hideTimer = setTimeout(() => {
+    badge.style.opacity = "0";
+    badge.style.transform = "translateX(-50%) translateY(20px)";
+    setTimeout(() => { try { badge.style.display = 'none'; } catch(e){} }, 450);
+  }, 3000);
+}
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -275,4 +318,4 @@ function navigateToPoet(city, poet) {
   setTimeout(() => {
     openCity(city);
   }, 1200);
-}
+}}
