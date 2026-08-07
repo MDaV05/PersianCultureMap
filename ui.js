@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════
-let currentEra = 0; // 🔥 این خط حتماً باید اینجا باشد (در map.js تعریف نشده است)
+let currentEra = 0;
 let panelStack = [];
 
 // ══════════════════════════════════════════
@@ -45,6 +45,14 @@ function openWork(work, poet) {
   renderPanel(panelStack[panelStack.length - 1], true);
 }
 
+// ── Safe DOM helpers ──
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
 function renderPanel({ type, data, city, poet }, showBack) {
   const backBtn = document.getElementById("panel-back");
   backBtn.classList.toggle("visible", showBack);
@@ -64,85 +72,140 @@ function renderPanel({ type, data, city, poet }, showBack) {
     body.style.transform = "translateY(0)";
   }, 20);
 
+  // Clear body safely
+  body.innerHTML = "";
+
   if (type === "city") {
     const era = ERAS[currentEra];
     eyebrow.textContent = "شهر · CITY";
     title.textContent = data.name;
     subtitle.textContent = data.nameEn + " · " + era.nameEn;
-    
+
     const poets = data.poets.filter(p => !p.eras || p.eras.includes(currentEra));
 
     if (poets.length === 0) {
-      body.innerHTML = `
-        <p style="text-align:center; color:var(--text-dim); padding:40px 20px; font-size:15px; line-height:1.8;">
-          شاعری برای «${era.name}» در این شهر ثبت نشده است.
-        </p>
-        <div class="more-info-link">
-          <a href="https://docs.chekameh.xyz/" target="_blank">اطلاعات بیشتر ←</a>
-        </div>`;
+      const emptyMsg = el("p", "empty-state");
+      emptyMsg.textContent = `شاعری برای «${era.name}» در این شهر ثبت نشده است.`;
+      body.appendChild(emptyMsg);
     } else {
-      body.innerHTML = poets
-        .map(
-          (p) => `
-        <div class="poet-card" onclick="openPoet(${JSON.stringify(p).replace(/"/g, "&quot;")}, ${JSON.stringify(data).replace(/"/g, "&quot;")})">
-          <div class="poet-avatar">${p.emoji}</div>
-          <div class="poet-info">
-            <div class="poet-name">${p.name}</div>
-            <div class="poet-name-en">${p.nameEn}</div>
-            <div class="poet-dates">${p.dates}</div>
-          </div>
-          <div class="poet-arrow">←</div>
-        </div>
-      `
-        )
-        .join("") + 
-        `<div class="more-info-link">
-          <a href="https://docs.chekameh.xyz/" target="_blank">اطلاعات بیشتر ←</a>
-        </div>`;
+      poets.forEach(p => {
+        const card = el("div", "poet-card");
+        card.dataset.poetId = p.id;
+        card.dataset.cityId = data.id;
+
+        const avatar = el("div", "poet-avatar", p.emoji);
+        const info = el("div", "poet-info");
+        info.appendChild(el("div", "poet-name", p.name));
+        info.appendChild(el("div", "poet-name-en", p.nameEn));
+        info.appendChild(el("div", "poet-dates", p.dates));
+        const arrow = el("div", "poet-arrow", "←");
+
+        card.appendChild(avatar);
+        card.appendChild(info);
+        card.appendChild(arrow);
+        body.appendChild(card);
+      });
     }
+
+    const moreLink = el("div", "more-info-link");
+    const link = el("a", null, "اطلاعات بیشتر ←");
+    link.href = "https://docs.chekameh.xyz/";
+    link.target = "_blank";
+    moreLink.appendChild(link);
+    body.appendChild(moreLink);
+
   } else if (type === "poet") {
     eyebrow.textContent = "شاعر · POET";
     title.textContent = data.name;
     subtitle.textContent = data.nameEn + " · " + data.dates;
 
-    body.innerHTML = `
-      <p id="poet-bio">${data.bio}</p>
-      <div class="works-title">WORKS · آثار برتر</div>
-      ${data.works
-        .map(
-          (w) => `
-        <div class="work-tile" onclick="openWork(${JSON.stringify(w).replace(/"/g, "&quot;")}, ${JSON.stringify({ name: data.name, nameEn: data.nameEn }).replace(/"/g, "&quot;")})">
-          <div class="work-tile-header">
-            <div>
-              <div class="work-name">${w.name}</div>
-              <div class="work-name-en">${w.nameEn}</div>
-            </div>
-            <div style="color:var(--gold);font-size:18px;">←</div>
-          </div>
-          <div class="work-desc">${w.desc}</div>
-        </div>
-      `
-        )
-        .join("")}
-      <div class="more-info-link">
-        <a href="https://docs.chekameh.xyz/" target="_blank">اطلاعات بیشتر ←</a>
-      </div>`;
+    const bio = el("p", "poet-bio", data.bio);
+    body.appendChild(bio);
+
+    const worksTitle = el("div", "works-title", "WORKS · آثار برتر");
+    body.appendChild(worksTitle);
+
+    data.works.forEach(w => {
+      const tile = el("div", "work-tile");
+      tile.dataset.workId = w.name;
+      tile.dataset.poetName = data.name;
+      tile.dataset.poetNameEn = data.nameEn;
+
+      const header = el("div", "work-tile-header");
+      const titleWrap = el("div");
+      titleWrap.appendChild(el("div", "work-name", w.name));
+      titleWrap.appendChild(el("div", "work-name-en", w.nameEn));
+      const arrow = el("div", "work-arrow", "←");
+      arrow.style.color = "var(--gold)";
+      arrow.style.fontSize = "18px";
+      header.appendChild(titleWrap);
+      header.appendChild(arrow);
+
+      const desc = el("div", "work-desc", w.desc);
+
+      tile.appendChild(header);
+      tile.appendChild(desc);
+      body.appendChild(tile);
+    });
+
+    const moreLink = el("div", "more-info-link");
+    const link = el("a", null, "اطلاعات بیشتر ←");
+    link.href = "https://docs.chekameh.xyz/";
+    link.target = "_blank";
+    moreLink.appendChild(link);
+    body.appendChild(moreLink);
+
   } else if (type === "work") {
     eyebrow.textContent = "اثر · WORK";
     title.textContent = data.name;
     subtitle.textContent = data.nameEn + (poet ? " · " + poet.nameEn : "");
 
-    body.innerHTML = `
-      <div class="poem-block">
-        <p class="poem-intro">${data.desc}</p>
-        <div class="poem-divider">— ✦ —</div>
-        ${data.lines.map((l) => `<div class="poem-line">${l}</div>`).join("")}
-      </div>
-      <div class="more-info-link">
-        <a href="https://docs.chekameh.xyz/" target="_blank">اطلاعات بیشتر ←</a>
-      </div>`;
+    const block = el("div", "poem-block");
+    const intro = el("p", "poem-intro", data.desc);
+    const divider = el("div", "poem-divider", "— ✦ —");
+    block.appendChild(intro);
+    block.appendChild(divider);
+
+    data.lines.forEach(line => {
+      block.appendChild(el("div", "poem-line", line));
+    });
+
+    body.appendChild(block);
+
+    const moreLink = el("div", "more-info-link");
+    const link = el("a", null, "اطلاعات بیشتر ←");
+    link.href = "https://docs.chekameh.xyz/";
+    link.target = "_blank";
+    moreLink.appendChild(link);
+    body.appendChild(moreLink);
   }
 }
+
+// ── Event delegation for dynamically created cards ──
+document.getElementById("panel-body").addEventListener("click", (e) => {
+  const card = e.target.closest(".poet-card");
+  if (card) {
+    const city = CITIES.find(c => c.id === card.dataset.cityId);
+    const poet = city?.poets.find(p => p.id === card.dataset.poetId);
+    if (city && poet) openPoet(poet, city);
+    return;
+  }
+
+  const tile = e.target.closest(".work-tile");
+  if (tile) {
+    const poetName = tile.dataset.poetName;
+    const poetNameEn = tile.dataset.poetNameEn;
+    const workName = tile.dataset.workId;
+
+    // Find the work in the current panel stack
+    const current = panelStack[panelStack.length - 1];
+    if (current?.type === "poet") {
+      const work = current.data.works.find(w => w.name === workName);
+      if (work) openWork(work, { name: poetName, nameEn: poetNameEn });
+    }
+    return;
+  }
+});
 
 // ══════════════════════════════════════════
 // TIMELINE & ERA
@@ -164,12 +227,12 @@ function updateEra(idx) {
   if (badge) {
     badge.textContent = `${era.name} · ${era.nameEn}`;
     void badge.offsetWidth; // فورس کردن Reflow برای اجرای صحیح انیمیشن در Brave/Safari
-    
+
     badge.style.opacity = "1";
     badge.style.transform = "translateX(-50%) translateY(0)";
-    
+
     if (badge._hideTimer) clearTimeout(badge._hideTimer);
-    
+
     badge._hideTimer = setTimeout(() => {
       badge.style.opacity = "0";
       badge.style.transform = "translateX(-50%) translateY(20px)";

@@ -1,4 +1,3 @@
-```
 # Logs and temp files
 *.log
 *.tmp
@@ -69,8 +68,7 @@ htmlcov/
 *.tar.xz
 *.tar.zst
 *.tar.lz4
-*.tar.lzh```
-
+*.tar.lzh
 
 # keys
 .dev.vars
@@ -81,5 +79,5 @@ htmlcov/
 !.dev.vars.example
 !.env.example
 
-
-chatbot.txt
+# Cloudflare worker config (contains KV namespace IDs)
+wrangler.toml

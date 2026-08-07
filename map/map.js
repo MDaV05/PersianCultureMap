@@ -55,6 +55,11 @@ function initializeMap() {
     
     // نمایش پاپ‌آپ دوره اولیه
     showEraPopup(STARTING_ERA);
+
+    // Signal that the map is ready (for deep linking)
+    window.map = map;
+    window.mapReady = true;
+    document.dispatchEvent(new CustomEvent("mapReady"));
   });
 }
 
@@ -68,7 +73,7 @@ function showEraPopup(eraIndex) {
   const popup = document.createElement('div');
   popup.id = 'era-popup-html';
   popup.className = 'era-popup-html';
-  popup.innerHTML = `${era.name} · ${era.nameEn}`;
+  popup.textContent = `${era.name} · ${era.nameEn}`;
   
   document.body.appendChild(popup);
 
@@ -151,10 +156,15 @@ function loadCities() {
   CITIES.forEach(city => {
     const el = document.createElement("div");
     el.className = "city-marker-html";
-    el.innerHTML = `
-      <div class="city-dot"></div>
-      <div class="city-label-text">${city.name}</div>
-    `;
+
+    const dot = document.createElement("div");
+    dot.className = "city-dot";
+    const label = document.createElement("div");
+    label.className = "city-label-text";
+    label.textContent = city.name;
+
+    el.appendChild(dot);
+    el.appendChild(label);
 
     el.addEventListener("click", (e) => {
       e.stopPropagation();

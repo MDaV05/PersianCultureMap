@@ -1,18 +1,12 @@
-    export function generateToken() {
+export function generateToken() {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const code = new Uint8Array(8);
+  crypto.getRandomValues(code);
 
-        const chars =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let token = "FP-";
+  for (let i = 0; i < code.length; i++) {
+    token += chars[code[i] % chars.length];
+  }
 
-        let code = "FP-";
-
-        for (let i = 0; i < 8; i++) {
-
-            code += chars[
-                Math.floor(
-                    Math.random() * chars.length
-                )
-            ];
-        }
-
-        return code;
-    }
+  return token;
+}

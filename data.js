@@ -19,7 +19,6 @@ const CITIES = [
     name: "بخارا",
     nameEn: "Bukhara",
     lat: 39.77, lon: 64.42,
-    x: 320, y: 180,
     eras: [0], // Kept your custom era
     headerImage: "images/cities/bukhara.jpg",
     poets: [
@@ -63,7 +62,6 @@ const CITIES = [
     name: "توس / مشهد",
     nameEn: "Tus / Mashhad",
     lat: 36.27, lon: 59.56,
-    x: 380, y: 220,
     eras: [0, 1], // Kept your custom era
     headerImage: "images/cities/mashhad.jpg",
     poets: [
@@ -91,7 +89,6 @@ const CITIES = [
     name: "نیشابور",
     nameEn: "Nishapur",
     lat: 36.21, lon: 58.79,
-    x: 410, y: 260,
     eras: [1], // Kept your custom era
     headerImage: "images/cities/nishapur.jpg",
     poets: [
@@ -134,7 +131,6 @@ const CITIES = [
     name: "شیراز",
     nameEn: "Shiraz",
     lat: 29.59, lon: 52.58,
-    x: 300, y: 400,
     eras: [2, 3], // Kept your custom era
     headerImage: "images/cities/shiraz.jpg",
     poets: [
@@ -182,7 +178,6 @@ const CITIES = [
     name: "بلخ",
     nameEn: "Balkh",
     lat: 36.76, lon: 66.90,
-    x: 450, y: 240,
     eras: [2, 3],
     headerImage: "images/cities/balkh.jpg",
     poets: [
@@ -211,7 +206,6 @@ const CITIES = [
     name: "سمرقند",
     nameEn: "Samarkand",
     lat: 39.65, lon: 66.97,
-    x: 340, y: 160,
     eras: [4], // Kept your custom era
     headerImage: "images/cities/samarkand.jpg",
     poets: [
@@ -237,7 +231,6 @@ const CITIES = [
     name: "اصفهان",
     nameEn: "Isfahan",
     lat: 32.66, lon: 51.68,
-    x: 350, y: 310,
     eras: [5],
     headerImage: "images/cities/isfahan.jpg",
     poets: [

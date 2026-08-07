@@ -482,6 +482,23 @@ background: linear-gradient(90deg, rgba(72, 207, 203, 0.7) 0%, rgba(34, 151, 153
   color: var(--turquoise);
 }
 
+.empty-state {
+  text-align: center;
+  color: var(--text-dim);
+  padding: 40px 20px;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.work-arrow {
+  transition: transform 0.2s, color 0.2s;
+}
+
+.work-tile:hover .work-arrow {
+  transform: translateX(-4px);
+  color: var(--turquoise);
+}
+
 /* ── POET DETAIL & WORKS ── */
 #poet-bio {
   font-size: 15px;
