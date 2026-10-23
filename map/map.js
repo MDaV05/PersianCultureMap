@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════
-// MAP — Bulletproof Basemap (No API Key Required + Optional CARTO Key)
+// MAP — Primary Basemap: CartoDB Positron (with API key) + Fallbacks
 // ══════════════════════════════════════════
 let map;
 let markers = [];
@@ -8,17 +8,27 @@ let eraPopup = null; // 🔥 Popup برای نمایش دوره
 const STARTING_ERA = 0;
 
 // ── Basemap Configuration ──
-// CartoDB now enforces API keys and stamps watermarks without one.
-// We default to Esri World Shaded Relief: 100% free, NO API key required,
-// NO watermarks, zero modern labels (ideal for historical Persian maps).
+// CartoDB Positron with official API key as primary basemap.
+// Esri Shaded Relief and Terrain remain available as key-free fallbacks.
 const BASEMAP_CONFIG = {
-  activeProvider: "shadedRelief",
+  activeProvider: "carto",
   cartoKey: (typeof window !== "undefined" && window.CARTO_API_KEY) ||
             (typeof localStorage !== "undefined" && localStorage.getItem("carto_api_key")) ||
-            null
+            "cb1_4siw_1_e17f79cbd8950e0bf9a1ceb3"
 };
 
 const BASEMAP_PROVIDERS = {
+  carto: {
+    getTiles: (key) => [
+      `https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png${key ? `?key=${key}` : ""}`,
+      `https://b.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png${key ? `?key=${key}` : ""}`,
+      `https://c.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png${key ? `?key=${key}` : ""}`,
+      `https://d.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png${key ? `?key=${key}` : ""}`
+    ],
+    attribution: "© CartoDB © OpenStreetMap",
+    opacity: 0.65,
+    saturation: -0.8
+  },
   shadedRelief: {
     tiles: [
       "https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}"
@@ -34,21 +44,12 @@ const BASEMAP_PROVIDERS = {
     attribution: "© Esri — USGS, NOAA",
     opacity: 0.65,
     saturation: -0.6
-  },
-  carto: {
-    getTiles: (key) => [
-      `https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png${key ? `?key=${key}` : ""}`,
-      `https://b.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png${key ? `?key=${key}` : ""}`,
-      `https://c.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png${key ? `?key=${key}` : ""}`
-    ],
-    attribution: "© CartoDB © OpenStreetMap",
-    opacity: 0.65,
-    saturation: -0.8
   }
 };
 
 function getActiveBasemapConfig() {
-  if (BASEMAP_CONFIG.cartoKey) {
+  const provider = BASEMAP_CONFIG.activeProvider;
+  if (provider === "carto" && BASEMAP_CONFIG.cartoKey) {
     return {
       tiles: BASEMAP_PROVIDERS.carto.getTiles(BASEMAP_CONFIG.cartoKey),
       attribution: BASEMAP_PROVIDERS.carto.attribution,
@@ -57,7 +58,7 @@ function getActiveBasemapConfig() {
     };
   }
 
-  const p = BASEMAP_PROVIDERS[BASEMAP_CONFIG.activeProvider] || BASEMAP_PROVIDERS.shadedRelief;
+  const p = BASEMAP_PROVIDERS[provider] || BASEMAP_PROVIDERS.shadedRelief;
   return {
     tiles: p.tiles,
     attribution: p.attribution,
@@ -105,7 +106,7 @@ function initializeMap() {
   });
 
   map.on("load", async () => {
-    console.log("✓ MapLibre loaded with bulletproof basemap");
+    console.log("✓ MapLibre loaded with " + BASEMAP_CONFIG.activeProvider + " basemap");
     await loadBorders(STARTING_ERA);
     loadCities();
     updateMarkers(STARTING_ERA);
@@ -125,7 +126,7 @@ function switchBasemap(providerName, optionalKey) {
     BASEMAP_CONFIG.cartoKey = optionalKey;
     try { localStorage.setItem("carto_api_key", optionalKey); } catch (e) {}
   }
-  if (BASEMAP_PROVIDERS[providerName] || providerName === "carto") {
+  if (BASEMAP_PROVIDERS[providerName]) {
     BASEMAP_CONFIG.activeProvider = providerName;
   }
 
@@ -239,6 +240,15 @@ async function loadBorders(eraIndex) {
   }
 }
 
+function clearBorders() {
+  if (map.getSource("empire")) {
+    map.getSource("empire").setData({
+      type: "FeatureCollection",
+      features: [],
+    });
+  }
+}
+
 // ══════════════════════════════════════════
 // CITIES
 // ══════════════════════════════════════════
@@ -252,6 +262,7 @@ function loadCities() {
 
     const dot = document.createElement("div");
     dot.className = "city-dot";
+
     const label = document.createElement("div");
     label.className = "city-label-text";
     label.textContent = city.name;
