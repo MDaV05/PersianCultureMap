@@ -1,11 +1,12 @@
 {
   "name": "persianculturemap",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "a website that provides you with a map of persian poem influence through the world and its most important poets and works of the each respective poet thorugh the most important eras of persian culture.",
   "main": "data.js",
   "scripts": {
     "start": "npx http-server -p 8081 -c-1",
     "dev": "npx http-server -p 8081 -c-1",
+    "deploy": "./deploy.sh",
     "deploy:worker": "wrangler deploy --config worker/wrangler.toml"
   },
   "repository": {

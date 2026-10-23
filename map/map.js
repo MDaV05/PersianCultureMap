@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════
-// MAP — Phase 5: Bulletproof CartoDB + Fixed Paths
+// MAP — Bulletproof Basemap (No API Key Required + Optional CARTO Key)
 // ══════════════════════════════════════════
 let map;
 let markers = [];
@@ -7,21 +7,78 @@ let citiesLoaded = false;
 let eraPopup = null; // 🔥 Popup برای نمایش دوره
 const STARTING_ERA = 0;
 
+// ── Basemap Configuration ──
+// CartoDB now enforces API keys and stamps watermarks without one.
+// We default to Esri World Shaded Relief: 100% free, NO API key required,
+// NO watermarks, zero modern labels (ideal for historical Persian maps).
+const BASEMAP_CONFIG = {
+  activeProvider: "shadedRelief",
+  cartoKey: (typeof window !== "undefined" && window.CARTO_API_KEY) ||
+            (typeof localStorage !== "undefined" && localStorage.getItem("carto_api_key")) ||
+            null
+};
+
+const BASEMAP_PROVIDERS = {
+  shadedRelief: {
+    tiles: [
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}"
+    ],
+    attribution: "© Esri — USGS, NOAA",
+    opacity: 0.65,
+    saturation: -0.7
+  },
+  terrain: {
+    tiles: [
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}"
+    ],
+    attribution: "© Esri — USGS, NOAA",
+    opacity: 0.65,
+    saturation: -0.6
+  },
+  carto: {
+    getTiles: (key) => [
+      `https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png${key ? `?key=${key}` : ""}`,
+      `https://b.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png${key ? `?key=${key}` : ""}`,
+      `https://c.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png${key ? `?key=${key}` : ""}`
+    ],
+    attribution: "© CartoDB © OpenStreetMap",
+    opacity: 0.65,
+    saturation: -0.8
+  }
+};
+
+function getActiveBasemapConfig() {
+  if (BASEMAP_CONFIG.cartoKey) {
+    return {
+      tiles: BASEMAP_PROVIDERS.carto.getTiles(BASEMAP_CONFIG.cartoKey),
+      attribution: BASEMAP_PROVIDERS.carto.attribution,
+      opacity: BASEMAP_PROVIDERS.carto.opacity,
+      saturation: BASEMAP_PROVIDERS.carto.saturation
+    };
+  }
+
+  const p = BASEMAP_PROVIDERS[BASEMAP_CONFIG.activeProvider] || BASEMAP_PROVIDERS.shadedRelief;
+  return {
+    tiles: p.tiles,
+    attribution: p.attribution,
+    opacity: p.opacity,
+    saturation: p.saturation
+  };
+}
+
 function initializeMap() {
+  const basemap = getActiveBasemapConfig();
+
   map = new maplibregl.Map({
     container: "map-container",
     style: {
       version: 8,
       sources: {
-        "carto-light": {
+        "basemap-source": {
           type: "raster",
-          tiles: [
-            "https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png",
-            "https://b.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png",
-            "https://c.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png"
-          ],
+          tiles: basemap.tiles,
           tileSize: 256,
-          attribution: "© CartoDB © OpenStreetMap"
+          attribution: basemap.attribution
         }
       },
       layers: [
@@ -33,10 +90,10 @@ function initializeMap() {
         {
           id: "basemap",
           type: "raster",
-          source: "carto-light",
+          source: "basemap-source",
           paint: {
-            "raster-opacity": 0.65,
-            "raster-saturation": -0.8
+            "raster-opacity": basemap.opacity,
+            "raster-saturation": basemap.saturation
           }
         }
       ]
@@ -48,7 +105,7 @@ function initializeMap() {
   });
 
   map.on("load", async () => {
-    console.log("✓ MapLibre loaded with CartoDB basemap");
+    console.log("✓ MapLibre loaded with bulletproof basemap");
     await loadBorders(STARTING_ERA);
     loadCities();
     updateMarkers(STARTING_ERA);
@@ -62,6 +119,42 @@ function initializeMap() {
     document.dispatchEvent(new CustomEvent("mapReady"));
   });
 }
+
+function switchBasemap(providerName, optionalKey) {
+  if (optionalKey) {
+    BASEMAP_CONFIG.cartoKey = optionalKey;
+    try { localStorage.setItem("carto_api_key", optionalKey); } catch (e) {}
+  }
+  if (BASEMAP_PROVIDERS[providerName] || providerName === "carto") {
+    BASEMAP_CONFIG.activeProvider = providerName;
+  }
+
+  if (!map) return;
+  const config = getActiveBasemapConfig();
+
+  if (map.getLayer("basemap")) map.removeLayer("basemap");
+  if (map.getSource("basemap-source")) map.removeSource("basemap-source");
+
+  map.addSource("basemap-source", {
+    type: "raster",
+    tiles: config.tiles,
+    tileSize: 256,
+    attribution: config.attribution
+  });
+
+  const beforeLayer = map.getLayer("empire-fill") ? "empire-fill" : undefined;
+  map.addLayer({
+    id: "basemap",
+    type: "raster",
+    source: "basemap-source",
+    paint: {
+      "raster-opacity": config.opacity,
+      "raster-saturation": config.saturation
+    }
+  }, beforeLayer);
+}
+
+window.switchBasemap = switchBasemap;
 
 function showEraPopup(eraIndex) {
   const era = ERAS[eraIndex];
