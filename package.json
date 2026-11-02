@@ -6,8 +6,10 @@
   "scripts": {
     "start": "npx http-server -p 8081 -c-1",
     "dev": "npx http-server -p 8081 -c-1",
-    "deploy": "./deploy.sh",
-    "deploy:worker": "wrangler deploy --config worker/wrangler.toml"
+    "deploy": "wrangler deploy",
+    "deploy:worker": "wrangler deploy --config worker/wrangler.toml",
+    "deploy:pages": "wrangler pages deploy . --project-name=chekameh",
+    "preview": "wrangler dev"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,6 @@
   },
   "devDependencies": {
     "http-server": "^14.1.1",
-    "wrangler": "^3.0.0"
+    "wrangler": "^4.156.2"
   }
 }

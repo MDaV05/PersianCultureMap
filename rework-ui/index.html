@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>چکامه · اطلس فرهنگی و شعر پارسی</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="../images/logo.png" type="image/x-icon" />
+
+  <!-- Google Fonts: Vazirmatn + Lalezar + Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- MapLibre GL 4.7.1 -->
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+
+  <!-- Master Rework Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=2" />
+</head>
+<body class="theme-illumination">
+
+  <!-- ── 1. CLEAN FLOATING HEADER (Pure logo, no dark frame, zero redundancy) ── -->
+  <header class="header-hud">
+    <div class="hud-brand">
+      <img src="../assets/Images/logo-vector.svg" alt="چکامه" class="brand-logo logo-light" onerror="this.src='../images/logo.png'" />
+      <img src="../assets/Images/logo-vector-dark.svg" alt="چکامه" class="brand-logo logo-dark" onerror="this.src='../images/logo.png'" />
+      <div class="brand-text">
+        <h1 class="brand-title">چـکـامـه</h1>
+        <span class="brand-tagline">اطلس شعر و تمدن پارسی</span>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+        <div class="hud-actions">
+      <!-- Search Trigger Button -->
+      <button class="hud-btn haptic-press" id="btn-search-trigger" title="جستجو در شعرا و شهرها (Ctrl+K)">
+        <svg class="hud-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span class="btn-text">جستجو</span>
+        <kbd class="btn-kbd">⌘K</kbd>
+      </button>
+
+      <!-- Basemap Switcher Dropdown -->
+      <div class="dropdown-wrapper">
+        <button class="hud-btn haptic-press" id="btn-basemap-menu" title="تغییر نقشه زمینه">
+          <svg class="hud-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
+          </svg>
+          <span class="btn-text" id="active-basemap-label">کارتو دی‌بی</span>
+        </button>
+        <div class="dropdown-menu" id="basemap-dropdown">
+          <button class="dropdown-item active" data-provider="carto">
+            <span class="item-title">CartoDB</span>
+            <span class="item-desc">نقشه بدون مرز مدرن</span>
+          </button>
+          <button class="dropdown-item" data-provider="shadedRelief">
+            <span class="item-title">Esri Shaded Relief</span>
+            <span class="item-desc">پستی و بلندی‌های جغرافیایی بدون مرز مدرن</span>
+          </button>
+          <button class="dropdown-item" data-provider="terrain">
+            <span class="item-title">Esri World Terrain</span>
+            <span class="item-desc">نقشه خاکی و اقلیمی تاریخی</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Tour Autoplay -->
+      <button class="hud-btn haptic-press tour-btn" id="btn-tour-toggle" title="پیمایش خودکار دوره‌ها">
+        <svg class="hud-icon icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+        <svg class="hud-icon icon-pause d-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="6" y="4" width="4" height="16"></rect>
+          <rect x="14" y="4" width="4" height="16"></rect>
+        </svg>
+        <span class="btn-text" id="tour-label">پیمایش خودکار</span>
+      </button>
+
+      <!-- Theme Toggle (Light / Dark) -->
+      <button class="hud-btn haptic-press theme-btn" id="btn-theme-toggle" title="حالت پوسته">
+        <svg class="hud-icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="hud-icon icon-moon d-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <span class="btn-text" id="theme-label">حالت روز</span>
+      </button>
+
+      <!-- Docs Hub Menu (Left-most) -->
+      <div class="dropdown-wrapper">
+        <button class="hud-btn haptic-press docs-trigger-btn" id="btn-docs-menu" title="دانشنامه و مستندات چکامه">
+          <svg class="hud-icon docs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+          </svg>
+          <span class="btn-text">دانشنامه</span>
+          <span class="docs-badge">Docs</span>
+        </button>
+        <div class="dropdown-menu docs-dropdown" id="docs-dropdown">
+          <a href="https://docs.chekameh.xyz/" target="_blank" rel="noopener noreferrer" class="dropdown-item">
+            <div class="item-head">
+              <span class="item-icon">🏛️</span>
+              <span class="item-title">صفحه اصلی دانشنامه</span>
+            </div>
+            <span class="item-desc">آشنایی با اهداف، کاربردها و چشم‌انداز چکامه</span>
+          </a>
+          <a href="https://docs.chekameh.xyz/data/" target="_blank" rel="noopener noreferrer" class="dropdown-item">
+            <div class="item-head">
+              <span class="item-icon">📊</span>
+              <span class="item-title">پایگاه داده‌ها و دوران‌ها</span>
+            </div>
+            <span class="item-desc">بررسی ساختار ۶ دوره تاریخی، شاعران و شهرها</span>
+          </a>
+          <a href="https://docs.chekameh.xyz/technical/" target="_blank" rel="noopener noreferrer" class="dropdown-item">
+            <div class="item-head">
+              <span class="item-icon">⚙️</span>
+              <span class="item-title">مستندات فنی و معماری</span>
+            </div>
+            <span class="item-desc">معماری MapLibre، سرور، CDN و لایه‌های GeoJSON</span>
+          </a>
+          <a href="https://docs.chekameh.xyz/resources/" target="_blank" rel="noopener noreferrer" class="dropdown-item">
+            <div class="item-head">
+              <span class="item-icon">📚</span>
+              <span class="item-title">منابع و مراجع پژوهشی</span>
+            </div>
+            <span class="item-desc">کتاب‌شناسی تاریخ ادبیات و اطلس‌های مرجع</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── 2. MAP CANVAS ── -->
+  <main id="map" class="map-viewport"></main>
+
+  <!-- ── 3. MAP HUD OVERLAYS ── -->
+  <!-- Historical Era Detail Card (The Single Authoritative Anchor for Era Context) -->
+  <aside class="era-card-hud" id="era-card-hud">
+    <div class="era-card-top">
+      <div class="era-card-badge" id="era-card-badge">صده ۳ و ۴ هجری</div>
+      <a href="https://docs.chekameh.xyz/data/eras/samanid/" target="_blank" rel="noopener noreferrer" class="era-docs-link" id="era-docs-link" title="مطالعه پرونده این دوره در دانشنامه">
+        <span>پرونده دوره در دانشنامه</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+      </a>
+    </div>
+    <h2 class="era-card-title lalezar" id="era-card-title">دوره‌ی سامانی</h2>
+    <div class="era-card-en" id="era-card-en">Samanid Dynasty</div>
+    <div class="era-card-period tabular-num" id="era-card-period" dir="ltr">875 – 1000 CE</div>
+    <p class="era-card-summary" id="era-card-summary">
+      عصر زرین ادب پارسی؛ شکوفایی خراسان بزرگ و ماوراءالنهر در دربار بخارا با سرایش شاهنامه و دیوان رودکی.
+    </p>
+  </aside>
+
+  <!-- Map Zoom/Compass Controls (Top-Left) -->
+  <div class="map-tools-hud">
+    <button class="tool-btn haptic-press" id="btn-zoom-in" title="بزرگ‌نمایی">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </button>
+    <button class="tool-btn haptic-press" id="btn-zoom-out" title="کوچک‌نمایی">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </button>
+    <button class="tool-btn haptic-press" id="btn-reset-view" title="بازنشانی زاویه دید">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+    </button>
+  </div>
+
+  <!-- ── 4. SLEEK ARCHITECTURAL TIMELINE SCRUBBER (Redesigned, compact & elegant) ── -->
+  <nav class="timeline-scrubber-container">
+    <div class="timeline-scrubber">
+      <!-- Step Back (Right in RTL = Earlier) -->
+      <button class="scrubber-nav-btn haptic-press" id="btn-prev-era" title="دوره قبلی (جهت راست)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+
+      <!-- Chronological Rail & Milestone Nodes -->
+      <div class="scrubber-track-area">
+        <div class="scrubber-rail">
+          <div class="scrubber-rail-fill" id="scrubber-rail-fill"></div>
+        </div>
+        <div class="scrubber-milestones" id="scrubber-milestones">
+          <!-- Dynamically generated sleek milestone nodes -->
+        </div>
+      </div>
+
+      <!-- Step Forward (Left in RTL = Later) -->
+      <button class="scrubber-nav-btn haptic-press" id="btn-next-era" title="دوره بعدی (جهت چپ)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── 5. CITY & POETS SLIDE-OVER DRAWER ── -->
+  <aside class="drawer-overlay" id="drawer-overlay" aria-hidden="true">
+    <div class="drawer-panel" id="drawer-panel">
+      <!-- Header with Photo & Gradient -->
+      <div class="drawer-hero" id="drawer-hero">
+        <div class="hero-image-wrap">
+          <img src="" alt="" id="drawer-hero-img" class="hero-image" />
+          <div class="hero-gradient"></div>
+        </div>
+        <button class="drawer-close-btn haptic-press" id="btn-close-drawer" aria-label="بستن پنجره">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div class="hero-meta">
+          <div class="hero-top-row">
+            <span class="hero-kicker">پایگاه فرهنگ و ادب</span>
+            <a href="https://docs.chekameh.xyz/data/cities/" target="_blank" rel="noopener noreferrer" class="city-docs-btn" id="city-docs-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+              <span>دانشنامه شهر</span>
+            </a>
+          </div>
+          <h2 class="hero-title lalezar" id="drawer-city-title">بخارا</h2>
+          <div class="hero-subtitle">
+            <span id="drawer-city-en">Bukhara</span>
+            <span class="hero-coords tabular-num" id="drawer-city-coords">39.77° N, 64.42° E</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Poets Selection Ribbon -->
+      <div class="poets-ribbon-wrap">
+        <div class="ribbon-label">شاعران این دیار در دوره حاضر:</div>
+        <div class="poets-chips" id="poets-chips">
+          <!-- Dynamic poet pill buttons -->
+        </div>
+      </div>
+
+      <!-- Active Poet Profile & Anthology -->
+      <div class="drawer-content" id="drawer-content">
+        <!-- Poet Brief Card -->
+        <div class="poet-card" id="poet-card">
+          <div class="poet-avatar" id="poet-avatar">📜</div>
+          <div class="poet-info">
+            <div class="poet-header-line">
+              <h3 class="poet-name" id="poet-name">رودکی سمرقندی</h3>
+              <a href="https://docs.chekameh.xyz/data/poets/rudaki/" target="_blank" rel="noopener noreferrer" class="poet-docs-badge" id="poet-docs-link">
+                <span>پرونده کامل شاعر در دانشنامه</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              </a>
+            </div>
+            <div class="poet-dates tabular-num" id="poet-dates" dir="ltr">858 – 941 CE</div>
+            <p class="poet-bio" id="poet-bio">پدر شعر فارسی، نخستین شاعر بزرگ ادبیات کلاسیک فارسی.</p>
+          </div>
+        </div>
+
+        <!-- Poetry Showcase / Bayt Reader -->
+        <div class="poetry-section">
+          <div class="section-header">
+            <div class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="section-icon">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              <span id="work-title">در ستایش دوستی و جاودانگی</span>
+            </div>
+            <!-- Verse Font Size Adjuster -->
+            <div class="verse-controls">
+              <button class="verse-tool-btn" id="btn-font-smaller" title="کوچک‌تر">A−</button>
+              <button class="verse-tool-btn" id="btn-font-larger" title="بزرگ‌تر">A+</button>
+              <button class="verse-tool-btn copy-btn" id="btn-copy-poem" title="کپی ابیات">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>کپی</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="work-desc" id="work-desc">قطعه‌ای زیبا از رودکی درباره‌ی ارزش دوستی و جاودانگی اثر نیک.</div>
+
+          <!-- The Classical Persian Bayt Container -->
+          <div class="bayt-scroll-container" id="bayt-container">
+            <!-- Dynamic dual-hemistich verses -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── 6. SPOTLIGHT SEARCH MODAL (CMD+K) ── -->
+  <div class="modal-backdrop" id="search-modal" aria-hidden="true">
+    <div class="search-dialog" role="dialog" aria-modal="true">
+      <div class="search-input-wrap">
+        <svg class="search-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="search-input" class="search-input" placeholder="جستجوی شاعر (مثلا حافظ، فردوسی)، شهر، دوره یا مستندات دانشنامه..." autocomplete="off" />
+        <button class="search-clear-btn" id="btn-clear-search">✕</button>
+      </div>
+
+      <div class="search-results-list" id="search-results">
+        <!-- Rendered results -->
+      </div>
+
+      <div class="search-footer">
+        <span class="shortcut-tip"><kbd>↑</kbd> <kbd>↓</kbd> پیمایش</span>
+        <span class="shortcut-tip"><kbd>↵</kbd> انتخاب و پرواز</span>
+        <span class="shortcut-tip"><kbd>ESC</kbd> خروج</span>
+        <a href="https://docs.chekameh.xyz/" target="_blank" rel="noopener noreferrer" class="docs-footer-link">
+          <span>ورود به دانشنامه جامع</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notice -->
+  <div class="toast-notice" id="toast-notice"></div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="../data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
